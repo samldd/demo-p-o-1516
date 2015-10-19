@@ -3,10 +3,37 @@
 
 <head>
     <title>P&O student-assistent site</title>
+    <script>
+    if (document.layers) {
+        document.captureEvents(Event.KEYDOWN);
+    }
+
+    document.onkeydown = function (evt) {
+      var keyCode = evt ? (evt.which ? evt.which : evt.keyCode) : event.keyCode;
+      if (keyCode == 38) {
+        // For Arrow up.
+        document.querySelector('input[value=forward]').click();
+      }
+      if (keyCode == 40) {
+        // For Arrow down.
+        document.querySelector('input[value=backward]').click();
+      }
+      if (keyCode == 37) {
+        // For Arrow left.
+        document.querySelector('input[value=left]').click();
+      }
+      if (keyCode == 39) {
+        // For Arrow right.
+        document.querySelector('input[value=right]').click();
+      }
+    };
+    </script>
 </head>
 
 <body>
-    <form method="post">
+    <iframe name="dummy_iframe" style="height: 70px"></iframe>
+    <h1>controls</h1>
+    <form method="post" target="dummy_iframe">
         <table>
             <tr>
                 <td></td>
@@ -18,8 +45,12 @@
                 <td><input type="submit" name="submit" value="backward"></td>
                 <td><input type="submit" name="submit" value="right"></td>
             </tr>
+            <tr><td></td></tr>
+            <tr><td><input type="submit" name="submit" value="kill"></td></tr>
         </table>
     </form>
+    <h1>debug</h1>
+    <p style="border:1px">{{ debug }}</p>
 </body>
 
 </html>
