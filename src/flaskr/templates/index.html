@@ -3,6 +3,9 @@
 
 <head>
     <title>P&O student-assistent site</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/font-autumn.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/site.css') }}">
+
     <script>
     if (document.layers) {
         document.captureEvents(Event.KEYDOWN);
@@ -31,26 +34,44 @@
 </head>
 
 <body>
-    <iframe name="dummy_iframe" style="height: 70px"></iframe>
+    <div style="padding: 20px">
+    <h1>request response</h1>
+    <iframe name="dummy_iframe" style="height: 70px" frameBorder="0"></iframe>
     <h1>controls</h1>
-    <form method="post" target="dummy_iframe">
+
         <table>
             <tr>
                 <td></td>
-                <td><input style="width:100%" type="submit" name="submit" value="forward"></td>
+                <td><a class="btn" href="javascript:document.querySelector('input[value=forward]').click();"><i class="icon-arrow-circle-up"></i></a></td>
                 <td></td>
             </tr>
             <tr>
-                <td><input type="submit" name="submit" value="left"></td>
-                <td><input type="submit" name="submit" value="backward"></td>
-                <td><input type="submit" name="submit" value="right"></td>
+                <td><a class="btn" href="javascript:document.querySelector('input[value=left]').click();"><i class="icon-arrow-circle-left"></i></a></td>
+                <td><a class="btn" href="javascript:document.querySelector('input[value=backward]').click();"><i class="icon-arrow-circle-down"></i></a></td>
+                <td><a class="btn" href="javascript:document.querySelector('input[value=right]').click();"><i class="icon-arrow-circle-right"></i></a></td>
             </tr>
-            <tr><td></td></tr>
-            <tr><td><input type="submit" name="submit" value="kill"></td></tr>
         </table>
+        <br>
+        <a class="btn" href="javascript:document.querySelector('input[value=line]').click();"><i class="icon-flag-checkered"></i> Drive line</a><br>
+        <a class="btn" href="javascript:document.querySelector('input[value=square]').click();"><i class="icon-square-o"></i> Drive square</a><br>
+        <a class="btn" href="javascript:document.querySelector('input[value=circle]').click();"><i class="icon-circle-o"></i> Drive circle</a><br>
+        <br>
+        <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a></td>
+    <form method="post" target="dummy_iframe">
+        <input type="submit" name="submit" value="left" style="display:none">
+        <input type="submit" name="submit" value="backward" style="display:none">
+        <input type="submit" name="submit" value="right" style="display:none">
+        <input type="submit" name="submit" value="forward" style="display:none">
+
+        <input type="submit" name="submit" value="line" style="display:none">
+        <input type="submit" name="submit" value="square" style="display:none">
+        <input type="submit" name="submit" value="circle" style="display:none">
+
+        <input type="submit" name="submit" value="kill" style="display:none">
     </form>
-    <h1>debug</h1>
-    <p style="border:1px">{{ debug }}</p>
+    <h1>information</h1>
+    <iframe src="/info" frameBorder="0"></iframe>
+    </div>
 </body>
 
 </html>

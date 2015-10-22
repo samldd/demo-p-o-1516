@@ -1,4 +1,5 @@
 import subprocess
+from time import gmtime, strftime
 
 def debug(f):            # debug decorator takes function f as parameter
     msg = f.__name__     # debug message to print later
@@ -31,4 +32,4 @@ def kill():
 
 @debug
 def get_debug_info():
-    pass
+    return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())

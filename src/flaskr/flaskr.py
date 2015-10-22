@@ -5,6 +5,10 @@ import interface
 
 app = Flask(__name__)
 
+@app.route('/info')
+def show_pi_information():
+    return render_template('information.html', info=interface.get_debug_info())
+
 @app.route('/', methods=['POST', 'GET'])
 def show_index():
     if request.method == 'POST':
@@ -26,7 +30,7 @@ def show_index():
         else:
             return render_template('debug_sentence.html', sentence='unknown command received')
     else:
-        return render_template('index.html', debug=interface.get_debug_info())
+        return render_template('index.html')
 
 if __name__ == '__main__':
     app.run()
