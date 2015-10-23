@@ -35,7 +35,7 @@ def show_index():
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:
-            return_sentence = traceback.format_exc()
+            return_sentence = traceback.format_exc().replace('\n', '<br />')
         return render_template('debug_sentence.html', sentence=return_sentence)
     else:
         return render_template('index.html')
