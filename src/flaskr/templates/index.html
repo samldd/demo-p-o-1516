@@ -56,8 +56,11 @@
         <a class="btn" href="javascript:document.querySelector('input[value=square]').click();"><i class="icon-square-o"></i> Drive square</a><br>
         <a class="btn" href="javascript:document.querySelector('input[value=circle]').click();"><i class="icon-circle-o"></i> Drive circle</a><br>
         <br>
-        <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a></td>
+        <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
+        <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
     <form method="post" target="dummy_iframe">
+        <input type="submit" name="submit" value="sharpleft" style="display:none">
+        <input type="submit" name="submit" value="sharpright" style="display:none">
         <input type="submit" name="submit" value="left" style="display:none">
         <input type="submit" name="submit" value="backward" style="display:none">
         <input type="submit" name="submit" value="right" style="display:none">
@@ -67,6 +70,7 @@
         <input type="submit" name="submit" value="square" style="display:none">
         <input type="submit" name="submit" value="circle" style="display:none">
 
+        <input type="submit" name="submit" value="picture" style="display:none">
         <input type="submit" name="submit" value="kill" style="display:none">
     </form>
     <h1>information</h1>

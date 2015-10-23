@@ -36,6 +36,9 @@ def show_index():
         elif request.form['submit'] == 'kill':
             interface.kill()
             return render_template('debug_sentence.html', sentence='executed command kill')
+        elif request.form['submit'] == 'picture':
+            interface.picture()
+            return render_template('debug_sentence.html', sentence='executed command picture')
         else:
             return render_template('debug_sentence.html', sentence='unknown command received')
     else:

@@ -69,6 +69,10 @@ def circle():
         BrickPi.MotorSpeed[PORT_B] = 250
         BrickPiUpdatesValues()
 
+def picture():
+    subprocess.call(["raspistill", "-0", "/robot/flaskr/static/last_image.jpg"])
+
+
 def kill():
     ##windows
     #subprocess.call(["Taskkill", "/F", "/IM", "python.exe"])
