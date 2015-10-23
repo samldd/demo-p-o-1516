@@ -70,7 +70,7 @@ def circle():
         BrickPiUpdatesValues()
 
 def picture():
-    subprocess.call(["raspistill", "-0", "/robot/flaskr/static/last_image.jpg"])
+    subprocess.call(["raspistill", "-0", "/robot/flaskr/static/last_image.jpg", "-t", "1"])
 
 
 def kill():
