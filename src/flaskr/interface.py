@@ -2,7 +2,20 @@ import subprocess
 from time import gmtime, strftime
 #from src.newRoboCar import robo_car
 from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+import time
 
+
+lastDirectionForward = True
+
+BrickPiSetup()  # setup the serial port for communication
+
+BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
+BrickPi.MotorEnable[PORT_B] = 1
+BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
+
+BrickPiUpdateValues()
+referenceB = BrickPi.Encoder[PORT_B]
+referenceC = BrickPi.Encoder[PORT_C]
 
 def debug(f):            # debug decorator takes function f as parameter
     msg = f.__name__     # debug message to print later
@@ -11,31 +24,51 @@ def debug(f):            # debug decorator takes function f as parameter
         return f(*args)  # call to original function
     return wrapper       # return the wrapper function, without calling it
 
-@debug
 def forward():
+    global lastDirectionForward
     BrickPi.MotorSpeed[PORT_C] = 200    #Set the speed of MotorA (-255 to 255)
     BrickPi.MotorSpeed[PORT_B] = 200
     BrickPiUpdateValues()
+    lastDirectionForward = True
 
-@debug
 def backward():
+    global lastDirectionForward
     BrickPi.MotorSpeed[PORT_C] = -200    #Set the speed of MotorA (-255 to 255)
     BrickPi.MotorSpeed[PORT_B] = -200
     BrickPiUpdateValues()
+    lastDirectionForward = False
 
-@debug
 def left():
-    BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = 250
+    if lastDirectionForward:
+        BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = 250
+    else:
+        BrickPi.MotorSpeed[PORT_C] = -100    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = -250
+
     BrickPiUpdateValues()
 
-@debug
 def right():
-    BrickPi.MotorSpeed[PORT_C] = 250    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = 100
+    if lastDirectionForward:
+        BrickPi.MotorSpeed[PORT_C] = 250    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = 100
+    else:
+        BrickPi.MotorSpeed[PORT_C] = -250    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = -100
     BrickPiUpdateValues()
 
-@debug
+def line():
+    pass
+
+def square():
+    pass
+
+def circle():
+    for i in range(100):
+        BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = 250
+        BrickPiUpdatesValues()
+
 def kill():
     ##windows
     #subprocess.call(["Taskkill", "/F", "/IM", "python.exe"])
@@ -43,6 +76,7 @@ def kill():
 
 @debug
 def get_debug_info():
+    global referenceB, referenceC
     # result = BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors
     # if not result :                 # if updating values succeeded
     #     C = ( BrickPi.Encoder[PORT_C] - referenceC )  # print the encoder degrees
@@ -57,13 +91,3 @@ def get_debug_info():
 
     return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
 
-BrickPiSetup()  # setup the serial port for communication
-
-BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
-BrickPi.MotorEnable[PORT_B] = 1
-BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
-
-#result = BrickPiUpdateValues()
-#global referenceB, referenceC
-#referenceB = BrickPi.Encoder[PORT_B]
-#referenceC = BrickPi.Encoder[PORT_C]

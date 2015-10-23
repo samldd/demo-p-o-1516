@@ -24,6 +24,15 @@ def show_index():
         elif request.form['submit'] == 'right':
             interface.right()
             return render_template('debug_sentence.html', sentence='executed command right')
+        elif request.form['submit'] == 'line':
+            interface.line()
+            return render_template('debug_sentence.html', sentence='executed command line')
+        elif request.form['submit'] == 'square':
+            interface.square()
+            return render_template('debug_sentence.html', sentence='executed command square')
+        elif request.form['submit'] == 'circle':
+            interface.circle()
+            return render_template('debug_sentence.html', sentence='executed command circle')
         elif request.form['submit'] == 'kill':
             interface.kill()
             return render_template('debug_sentence.html', sentence='executed command kill')
@@ -33,4 +42,4 @@ def show_index():
         return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
