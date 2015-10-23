@@ -1,21 +1,27 @@
-import subprocess
-from time import gmtime, strftime
-#from src.newRoboCar import robo_car
-from BrickPi import *   #import BrickPi.py file to use BrickPi operations
-import time
+import subprocess, sys
+from time import gmtime, strftime, sleep
 
+if sys.platform != 'win32':
+    from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+
+from threading import Thread
 
 lastDirectionForward = True
 
-BrickPiSetup()  # setup the serial port for communication
+def setup_brickpi():
+    global referenceB, referenceC
+    BrickPiSetup()  # setup the serial port for communication
 
-BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
-BrickPi.MotorEnable[PORT_B] = 1
-BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
+    BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
+    BrickPi.MotorEnable[PORT_B] = 1
+    BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
 
-BrickPiUpdateValues()
-referenceB = BrickPi.Encoder[PORT_B]
-referenceC = BrickPi.Encoder[PORT_C]
+    BrickPiUpdateValues()
+    referenceB = BrickPi.Encoder[PORT_B]
+    referenceC = BrickPi.Encoder[PORT_C]
+
+if sys.platform != 'win32':
+    setup_brickpi()
 
 def debug(f):            # debug decorator takes function f as parameter
     msg = f.__name__     # debug message to print later
@@ -45,7 +51,6 @@ def left():
     else:
         BrickPi.MotorSpeed[PORT_C] = -100    #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_B] = -250
-
     BrickPiUpdateValues()
 
 def right():
@@ -64,7 +69,7 @@ def square():
     pass
 
 def circle():
-    for i in range(100):
+    for i in range(10):
         BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_B] = 250
         BrickPiUpdatesValues()
@@ -74,11 +79,11 @@ def picture():
 
 
 def kill():
-    ##windows
-    #subprocess.call(["Taskkill", "/F", "/IM", "python.exe"])
-    subprocess.call(["sudo", "killall", "python", "-9"])
+    if sys.platform == 'win32':
+        subprocess.call(["Taskkill", "/F", "/IM", "python.exe"])
+    else:
+        subprocess.call(["sudo", "killall", "python", "-9"])
 
-@debug
 def get_debug_info():
     global referenceB, referenceC
     # result = BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors

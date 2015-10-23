@@ -36,7 +36,7 @@
 <body>
     <div style="padding: 20px">
     <h1>request response</h1>
-    <iframe name="dummy_iframe" style="height: 70px" frameBorder="0"></iframe>
+    <iframe name="response_iframe" style="height: 70px; width: 600px" frameBorder="0"></iframe>
     <h1>controls</h1>
 
         <table>
@@ -58,7 +58,7 @@
         <br>
         <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
         <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
-    <form method="post" target="dummy_iframe">
+    <form method="post" target="response_iframe">
         <input type="submit" name="submit" value="sharpleft" style="display:none">
         <input type="submit" name="submit" value="sharpright" style="display:none">
         <input type="submit" name="submit" value="left" style="display:none">
