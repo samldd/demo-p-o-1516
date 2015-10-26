@@ -30,6 +30,20 @@
         document.querySelector('input[value=right]').click();
       }
     };
+
+    var newImage = new Image();
+    newImage.src = "{{ url_for('static', filename='last_image.jpg') }}";
+    updateImage();
+    function updateImage()
+    {
+        if(newImage.complete) {
+            document.getElementById("stream").src = newImage.src;
+            newImage = new Image();
+            newImage.src = "{{ url_for('static', filename='last_image.jpg') }}";
+        }
+
+        setTimeout(updateImage, 1000);
+    }
     </script>
 </head>
 
@@ -38,7 +52,6 @@
     <h1>request response</h1>
     <iframe name="response_iframe" style="height: 70px; width: 600px" frameBorder="0"></iframe>
     <h1>controls</h1>
-
         <table>
             <tr>
                 <td></td>
@@ -58,6 +71,8 @@
         <br>
         <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
         <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
+        <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
+
     <form method="post" target="response_iframe">
         <input type="submit" name="submit" value="sharpleft" style="display:none">
         <input type="submit" name="submit" value="sharpright" style="display:none">
@@ -71,10 +86,14 @@
         <input type="submit" name="submit" value="circle" style="display:none">
 
         <input type="submit" name="submit" value="picture" style="display:none">
+        <input type="submit" name="submit" value="stream" style="display:none">
+
         <input type="submit" name="submit" value="kill" style="display:none">
     </form>
+        <h1>Picture</h1>
+        <img id="stream"/>
     <h1>information</h1>
-    <iframe src="/info" frameBorder="0"></iframe>
+    <iframe src="/info" frameBorder="0" style="height: 550px; width: 680px;"></iframe>
     </div>
 </body>
 

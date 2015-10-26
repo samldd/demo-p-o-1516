@@ -32,6 +32,8 @@ def show_index():
                 interface.kill()
             elif request.form['submit'] == 'picture':
                 interface.picture()
+            elif request.form['submit'] == 'stream':
+                interface.stream()
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:

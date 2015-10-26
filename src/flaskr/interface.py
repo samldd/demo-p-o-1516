@@ -74,8 +74,20 @@ def circle():
         BrickPi.MotorSpeed[PORT_B] = 250
         BrickPiUpdatesValues()
 
+def stream():
+    width =2592
+    height=1944
+    scale = 0.25
+    time = 20 #stream time in seconds
+    timelapse = 500 #milliseconds between pics
+    subprocess.Popen(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", str(time*1000), "-tl", str(timelapse), "-n", "-w", str(width*scale), "-h", str(height*scale)])
+
 def picture():
-    subprocess.call(["raspistill", "-0", "/robot/flaskr/static/last_image.jpg", "-t", "1"])
+    width =2592
+    height=1944
+    scale = 0.25
+
+    subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width*scale), "-h", str(height*scale)])
 
 
 def kill():
