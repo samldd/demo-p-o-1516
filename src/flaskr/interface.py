@@ -1,4 +1,4 @@
-import subprocess, sys
+import subprocess, sys, traceback
 from time import gmtime, strftime, sleep
 
 if sys.platform != 'win32':
@@ -44,6 +44,28 @@ def backward():
     BrickPiUpdateValues()
     lastDirectionForward = False
 
+def sharpleft():
+    startval = BrickPi.Encoder[PORT_C]
+    while abs(BrickPi.Encoder[PORT_C] - startval) < 1000:
+        if lastDirectionForward:
+            BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = 0
+        else:
+            BrickPi.MotorSpeed[PORT_C] = -100    #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = 0
+        BrickPiUpdateValues()
+
+def sharpright():
+    startval = BrickPi.Encoder[PORT_C]
+    while abs(BrickPi.Encoder[PORT_C] - startval) < 1000:
+        if lastDirectionForward:
+            BrickPi.MotorSpeed[PORT_C] = 250    #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = 0
+        else:
+            BrickPi.MotorSpeed[PORT_C] = -250    #Set the speed of MotorA (-255 to 255)
+            BrickPi.MotorSpeed[PORT_B] = 0
+        BrickPiUpdateValues()
+
 def left():
     if lastDirectionForward:
         BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
@@ -69,10 +91,11 @@ def square():
     pass
 
 def circle():
-    for i in range(10):
-        BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
+    startval = BrickPi.Encoder[PORT_B]
+    while BrickPi.Encoder[PORT_B] - startval < 15000:
+        BrickPi.MotorSpeed[PORT_C] = 175    #Set the speed of MotorA (-255 to 255)
         BrickPi.MotorSpeed[PORT_B] = 250
-        BrickPiUpdatesValues()
+        BrickPiUpdateValues()
 
 def stream():
     width =2592
@@ -97,18 +120,19 @@ def kill():
         subprocess.call(["sudo", "killall", "python", "-9"])
 
 def get_debug_info():
-    global referenceB, referenceC
-    # result = BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors
-    # if not result :                 # if updating values succeeded
-    #     C = ( BrickPi.Encoder[PORT_C] - referenceC )  # print the encoder degrees
-    #     B = ( BrickPi.Encoder[PORT_B] - referenceB )
-    #     print "%d: %d , %d" %(i,C,B)
-    #     i = i +1
-    #
-    # debuginfo = "motor left speed:",C
-    # debuginfo+= "<br>" #newline in html
-    # debuginfo = "motor right speed:", B
-    # return debuginfo
+    if sys.platform == 'win32':
+        return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
+    try:
+        global referenceB, referenceC
 
-    return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
+        C = BrickPi.Encoder[PORT_C] - referenceC  # print the encoder degrees
+        B = BrickPi.Encoder[PORT_B] - referenceB
+
+        debuginfo = "it is now: %s<br><br>"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
+        debuginfo+= "motor left encoder: " + str(C)
+        debuginfo+= "<br>" #newline in html
+        debuginfo+= "motor right encoder:" + str(B)
+        return debuginfo
+    except:
+        return traceback.format_exc().replace('\n', '<br />')
 

@@ -22,6 +22,10 @@ def show_index():
                 interface.left()
             elif request.form['submit'] == 'right':
                 interface.right()
+            elif request.form['submit'] == 'sharpleft':
+                interface.sharpleft()
+            elif request.form['submit'] == 'sharpright':
+                interface.sharpright()
             elif request.form['submit'] == 'line':
                 interface.line()
             elif request.form['submit'] == 'square':
