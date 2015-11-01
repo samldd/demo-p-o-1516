@@ -1,34 +1,28 @@
-import time
+import driving
+import value_updater
 
-from BrickPi import PORT_B, PORT_C, PORT_D #@UnresolvedImport
-from driving import Driving
-import motor as M
 
 class RoboCar(object):
-
     def __init__(self):
-        
-        # Ports
-        LEFT_PORT = PORT_C
-        RIGHT_PORT = PORT_B
-        
-        # Hardware
-        self.left_motor = M.Motor(LEFT_PORT)
-        self.right_motor = M.Motor(RIGHT_PORT)
-        
-        # Driving
-        self.driving = Driving(self)
-        self.total_distance_driven = 0
+        self.driving = driving.Driving()
+        self.value_updater = value_updater.ValueUpdater()
     
-    def get_left_motor(self):
-        return self.left_motor
-
-    def get_right_motor(self):
-        return self.right_motor
-    
-    def drive_blind(self, distance):
+    def drive_straight(self, distance):
+        self.value_updater.start()
         self.driving.drive_straight(distance)
-    
-    def turn(self, degree):
-        self.driving.turn(degree)
-    
+        self.value_updater.stop()
+
+    def turn(self,degrees):
+        self.value_updater.start()
+        self.driving.turn(degrees)
+        self.value_updater.stop()
+
+    def drive_arc(self,degrees, radius):
+        self.value_updater.start()
+        self.driving.drive_arc(degrees,radius)
+        self.value_updater.stop()
+
+    def drive_square(self, size):
+        for _ in range(0,3):
+            self.drive_straight(size)
+            self.turn(90)

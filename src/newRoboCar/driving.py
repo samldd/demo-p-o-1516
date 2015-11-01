@@ -1,86 +1,74 @@
 import math
 import time
-from BrickPi import *
+import BrickPi
+import motor
 
 class Driving(object):
 
-    def __init__(self, car):
-        self.car = car
-        self.default_v = 210
+    def __init__(self):
+        self.left_motor = motor.Motor(BrickPi.PORT_C)
+        self.right_motor = motor.Motor(BrickPi.PORT_B)
+
+        self.sampeling_time = 0.1
+        self.default_speed = 210
         self.perimeter = 0.056 * math.pi
-
         self.WHEEL_DISTANCE = 0.1521
-        self.total_distance_driven = 0
-
-        # Motors
-        self.left_motor = self.car.get_left_motor()
-        self.right_motor = self.car.get_right_motor()
 
     def turn(self, degree):
         wheel_degrees = 2 * self.WHEEL_DISTANCE * math.pi * degree / self.perimeter
-        speed = 130 if wheel_degrees >= 0 else -130
-        self.__start_motors([self.left_motor, self.right_motor],[speed, -speed])
+        speed = 180 if wheel_degrees >= 0 else -180
+        self.__start_motors()
+        self.left_motor.set_velocity(speed)
+        self.right_motor.set_velocity(-speed)
 
-        while True:
-            if abs(self.left_motor.get_encoder()) > abs(wheel_degrees) or abs(self.right_motor.get_encoder()) > abs(wheel_degrees):
-                self.__stop_motors([self.left_motor, self.right_motor])
-                break
+        while not self.__goal_reached():
+            time.sleep(self.sampeling_time)
+        self.__stop_motors()
 
     def drive_straight(self, distance):
-        degrees = 0.02 * distance / self.perimeter * 360
-        speed = self.default_v
-        sampling_time = 0.1
-        # delay_when_stopping = 0.05
+        speed = self.default_speed
 
         # Start motors
-        self.__start_motors([self.left_motor, self.right_motor], [speed, speed])
+        self.__start_motors()
+        self.right_motor.set_velocity(speed)
+        self.left_motor.set_velocity(speed)
 
         # Initialize PID values and constants
         integral = 0
         previous = 0
-        kp = 4          # proportionele factor
+
+        kp = 1          # proportionele factor
         kd = 0.1        # afgeleide     factor
         ki = 0          # integraal     factor
 
-        while True:
-            print "driving"
-            BrickPiUpdateValues()
-            # Check if both motors have stopped
-            print self.left_motor.get_encoder()
-            print self.right_motor.get_encoder()
-            if abs(self.left_motor.get_encoder()) > abs(degrees) or abs(self.right_motor.get_encoder()) > abs(degrees):
-                self.__stop_motors([self.left_motor, self.right_motor])
-                break
-
+        while not (self.__goal_reached(distance)):
             # Calculate PID values
-            error = self.left_motor.get_encoder() - self.right_motor.get_encoder()
-            integral = integral + error * sampling_time
-            derivative = (error - previous) / sampling_time
+            error = self.left_motor.get_encoder_value() - self.right_motor.get_encoder_value()
+            integral = integral + error * self.sampling_time
+            derivative = (error - previous) / self.sampling_time
             output = kp * error + ki * integral + kd * derivative
             previous = error
 
-            # Add output to speed left motor
-            # mogelijk -output
-            self.left_motor.set_speed(speed-output)
-            time.sleep(sampling_time)
+            self.left_motor.set_velocity(speed-output)
+            time.sleep(self.sampling_time)
 
+        self.__stop_motors()
 
-    def __start_motors(self, motors, speeds):
-        print "start motors"
-        for motor in motors:
-            motor.reset_encoder()
+    def drive_arc(self, degrees, radius):
+        pass
 
-        for i in range(len(motors)):
-            motors[i].start(speeds[i])
+    def __get_number_ticks(self, distance):
+        pass
 
-    def __stop_motors(self, motors, delay_when_stopping=0.05):
-        print "stop motors"
-        for motor in motors:
-            motor.set_speed(-motor.current_speed)
-        time.sleep(delay_when_stopping)
-        for motor in motors:
-            motor.set_speed(0)
-            BrickPi.MotorEnable[motor.port] = 0
-            self.running = False
-        print "end"
+    def __goal_reached(self,distance):
+        ticks = self.get_number_ticks(distance)
+        abs(self.left_motor.get_encoder_value()) > abs(ticks) or abs(self.right_motor.get_encoder_value()) > abs(ticks)
+        return False
 
+    def __start_motors(self):
+        self.left_motor.enable_motor()
+        self.right_motor.enable_motor()
+
+    def __stop_motors(self):
+        self.left_motor.disable_motor()
+        self.right_motor.disable_motor()
