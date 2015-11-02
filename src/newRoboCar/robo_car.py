@@ -9,7 +9,7 @@ class RoboCar(object):
     
     def drive_straight(self, distance):
         self.value_updater.start()
-        self.driving.drive_straight(distance)
+        self.driving.drive_straight2(distance)
         self.value_updater.stop()
 
     def turn(self,degrees):

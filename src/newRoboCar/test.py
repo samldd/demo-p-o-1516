@@ -1,15 +1,7 @@
 __author__ = 'sam_l'
-from robo_car import RoboCar
-from value_updater import ValueUpdater
 
-roboCar = RoboCar()
+import robo_car
 
-print "test script"
+robo = robo_car.RoboCar()
 
-v = ValueUpdater()
-v.start()
-print "value updater gestart"
-
-roboCar.drive_blind(100)
-
-v.stop()
+robo.drive_arc(50,1)

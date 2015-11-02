@@ -1,13 +1,13 @@
 __author__ = 'sam_l'
-import BrickPi
+from BrickPi import BrickPi
 import time
 
 class MotorSession(object):
 
     def __init__(self, port):
-        self.encoder_reference = BrickPi.Encoder[self.port]
         self.velocity = 0
         self.port = port
+        self.encoder_reference = BrickPi.Encoder[self.port]
 
     def get_velocity(self):
         return self.velocity
@@ -20,9 +20,10 @@ class MotorSession(object):
 
     def get_session_encoder(self):
         current_ticks = BrickPi.Encoder[self.port]
-        return current_ticks - self.encoder_reference
+        new_val = current_ticks - self.encoder_reference
+        return new_val
 
     def end_session(self):
         self.set_velocity(-self.get_velocity())
         time.sleep(0.05)
-        self.set_speed(0)
+        self.set_velocity(0)
