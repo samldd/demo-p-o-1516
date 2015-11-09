@@ -10,7 +10,7 @@ class ValueUpdater(threading.Thread):
     def run(self):
         self.should_stop = False
         while not self.should_stop:
-            time.sleep(0.05)
+            time.sleep(0.04)
             BrickPi.BrickPiUpdateValues()
 
     def stop(self):
