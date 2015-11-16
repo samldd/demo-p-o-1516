@@ -38,6 +38,8 @@ def show_index():
                 interface.picture()
             elif request.form['submit'] == 'stream':
                 interface.stream()
+            elif request.form['submit'] == 'followline':
+                interface.followline()
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:
