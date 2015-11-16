@@ -20,7 +20,7 @@ def sendImage():
     f.close()
     print "Done Sending"
     s.shutdown(socket.SHUT_WR)
-    print s.recv(1024)
+    print s.recv(1024) #dit is resultaat van de functie die opgeroepen werd
 
 def stopStocket():
     s.close()
