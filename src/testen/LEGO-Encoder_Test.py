@@ -15,8 +15,9 @@ BrickPiSetup()  # setup the serial port for communication
 
 BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
 BrickPi.MotorEnable[PORT_B] = 1
-BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
-BrickPi.MotorSpeed[PORT_B] = 250
+
+BrickPi.MotorSpeed[PORT_C] = 200    #Set the speed of MotorA (-255 to 255)
+BrickPi.MotorSpeed[PORT_B] = 200
 
 BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
 
@@ -27,10 +28,12 @@ i = 0
 while True:
     result = BrickPiUpdateValues()  # Ask BrickPi to update values for sensors/motors
     if not result :                 # if updating values succeeded
-        C = ( BrickPi.Encoder[PORT_C] - referenceC )  # print the encoder degrees
-        B = ( BrickPi.Encoder[PORT_B] - referenceB )
-        print "%d: %d , %d" %(i,C,B)
+        A = ( BrickPi.Encoder[PORT_A])
+        B = ( BrickPi.Encoder[PORT_B])
+        C = ( BrickPi.Encoder[PORT_C])  # print the encoder degrees
+        D = ( BrickPi.Encoder[PORT_D])
+        print "%d, %d , %d, %d" %(A,B,C,D)
         i = i +1
-    time.sleep(.1)		#sleep for 100 ms
+    time.sleep(.05)		#sleep for 100 ms
 
 # Note: One encoder value counts for 0.5 degrees. So 360 degrees = 720 enc. Hence, to get degress = (enc%720)/2
