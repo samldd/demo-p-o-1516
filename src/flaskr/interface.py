@@ -97,6 +97,13 @@ def circle():
         BrickPi.MotorSpeed[PORT_B] = 250
         BrickPiUpdateValues()
 
+def followline():
+    while True:
+        picture()
+        #BEREKEN HOEK met code in find_line.py
+        #draai juiste hoek
+        #rij rechtdoor
+
 def stream():
     width =2592
     height=1944
@@ -135,4 +142,3 @@ def get_debug_info():
         return debuginfo
     except:
         return traceback.format_exc().replace('\n', '<br />')
-

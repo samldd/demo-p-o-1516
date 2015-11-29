@@ -1,6 +1,6 @@
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash
-
+     abort, render_template, flash, jsonify
+import socket_client
 import interface, sys, traceback
 
 app = Flask(__name__)
@@ -11,6 +11,9 @@ def show_pi_information():
 
 @app.route('/', methods=['POST', 'GET'])
 def show_index():
+    if socket_client.s == None:
+        socket_client.startSocket(request.remote_addr)
+
     if request.method == 'POST':
         return_sentence = 'executed command ' + request.form['submit']
         try:
@@ -38,6 +41,8 @@ def show_index():
                 interface.picture()
             elif request.form['submit'] == 'stream':
                 interface.stream()
+            elif request.form['submit'] == 'followline':
+                interface.followline()
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:
