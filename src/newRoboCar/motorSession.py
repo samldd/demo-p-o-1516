@@ -21,21 +21,23 @@ class MotorSession(object):
 
     def get_session_encoder(self):
         current_ticks = BrickPi.Encoder[self.port]
-        new_val = current_ticks - self.encoder_reference
-        if new_val < -100000:
-            raise NameError("slechte encoder waarde")
-        return new_val
-
-    def get_encoder_diff(self):
+        if current_ticks == 0:
+            self.port_switch()
         current_ticks = BrickPi.Encoder[self.port]
         new_val = current_ticks - self.encoder_reference
-        result = new_val - self.previous
-        self.previous = new_val
-        if new_val < -100000:
-            raise NameError("slechte encoder waarde")
-        return result
+        return new_val
 
     def end_session(self):
         self.set_velocity(-self.get_velocity())
         time.sleep(0.05)
         self.set_velocity(0)
+
+    def port_switch(self):
+        if self.port == BrickPi.PORT_A:
+            self.port = BrickPi.port_C
+        elif self.port == BrickPi.PORT_B:
+            self.port = BrickPi.port_D
+        elif self.port == BrickPi.PORT_C:
+            self.port = BrickPi.port_A
+        elif self.port == BrickPi.PORT_D:
+            self.port = BrickPi.port_B
