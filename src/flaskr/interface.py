@@ -105,12 +105,11 @@ def followline():
         #rij rechtdoor
 
 def stream():
-    width =2592
-    height=1944
-    scale = 6
     time = 20 #stream time in seconds
-    timelapse = 250 #milliseconds between pics, make twice as fast than actual wanted fps
-    subprocess.Popen(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-q", str(10), "-t", str(time*1000), "-tl", str(timelapse), "-n", "-w", str(width/scale), "-h", str(height/scale)])
+    timelapse = 100 #milliseconds between pics, make twice as fast than actual wanted fps
+    #-q set jpeg quality
+    #-sh set sharpness (-100 to 100)
+    subprocess.Popen(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", str(time*1000), "-tl", str(timelapse), "-n", "-w", "640", "-h", "480", "-md", "6"])
 
 def picture():
     width =2592

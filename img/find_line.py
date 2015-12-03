@@ -8,9 +8,9 @@ import math
 def line_angle(l):
     return int(math.degrees(math.atan2(-(l[3]-l[1]),(l[2]-l[0]))))+180
 
-for i in range(1,22):
+for i in range(22,23):
     im = cv2.imread('last_image (%d).jpg'%i)
-    im = im[len(im)/3:, :]
+    im = im[:, :]
 
     blur = cv2.medianBlur(im,31)
     gray_image = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
