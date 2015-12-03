@@ -4,4 +4,4 @@ import robo_car
 
 robo = robo_car.RoboCar()
 
-robo.drive_arc(90,0.25)
+robo.drive_straight(1)

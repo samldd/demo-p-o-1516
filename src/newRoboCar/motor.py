@@ -22,9 +22,6 @@ class Motor(object):
         encoder = self.motorSession.get_session_encoder()
         return encoder
 
-    def get_encoder_velocity(self):
-        return self.motorSession.get_encoder_diff()
-
     def get_velocity(self):
         return self.motorSession.get_velocity()
 
