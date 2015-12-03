@@ -1,7 +1,8 @@
 from flask import Flask, request, session, g, redirect, url_for, \
-     abort, render_template, flash, jsonify
-import socket_client
+     abort, render_template, flash, jsonify, Response
+#import socket_client
 import interface, sys, traceback
+from camera import Camera
 
 app = Flask(__name__)
 
@@ -9,10 +10,23 @@ app = Flask(__name__)
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
 
+
+
+def gen(camera):
+    while True:
+        frame = camera.get_frame()
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
 @app.route('/', methods=['POST', 'GET'])
 def show_index():
-    if socket_client.s == None:
-        socket_client.startSocket(request.remote_addr)
+    #if socket_client.s == None:
+        #socket_client.startSocket(request.remote_addr)
 
     if request.method == 'POST':
         return_sentence = 'executed command ' + request.form['submit']
