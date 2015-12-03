@@ -32,7 +32,7 @@ while True:
         B = ( BrickPi.Encoder[PORT_B])
         C = ( BrickPi.Encoder[PORT_C])  # print the encoder degrees
         D = ( BrickPi.Encoder[PORT_D])
-        print "%d, %d , %d, %d" %(A,B,C,D)
+        print "%d, %d , %d, %d" %(BrickPi.Encoder[PORT_A],BrickPi.Encoder[PORT_B],BrickPi.Encoder[PORT_C],BrickPi.Encoder[PORT_D])
         i = i +1
     time.sleep(.05)		#sleep for 100 ms
 

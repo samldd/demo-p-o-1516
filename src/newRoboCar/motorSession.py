@@ -1,6 +1,6 @@
-__author__ = 'sam_l'
 from BrickPi import BrickPi
 import time
+
 
 class MotorSession(object):
 
@@ -21,7 +21,7 @@ class MotorSession(object):
 
     def get_session_encoder(self):
         current_ticks = BrickPi.Encoder[self.port]
-        if current_ticks == 0:
+        if current_ticks == 0 and not(current_ticks == self.encoder_reference):
             self.port_switch()
         current_ticks = BrickPi.Encoder[self.port]
         new_val = current_ticks - self.encoder_reference
@@ -33,11 +33,11 @@ class MotorSession(object):
         self.set_velocity(0)
 
     def port_switch(self):
-        if self.port == BrickPi.PORT_A:
-            self.port = BrickPi.port_C
-        elif self.port == BrickPi.PORT_B:
-            self.port = BrickPi.port_D
-        elif self.port == BrickPi.PORT_C:
-            self.port = BrickPi.port_A
-        elif self.port == BrickPi.PORT_D:
-            self.port = BrickPi.port_B
+        if self.port == 0:
+            self.port = 2
+        elif self.port == 1:
+            self.port = 3
+        elif self.port == 2:
+            self.port = 0
+        elif self.port == 3:
+            self.port = 1

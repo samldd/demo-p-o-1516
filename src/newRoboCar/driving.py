@@ -26,22 +26,26 @@ class Driving(object):
 
     def drive_arc(self, degrees, radius):
         "Drive a circle arc with radius radius and arc angle degrees. Give a positive radius for a circle to the left "
-        factor = 1
         if radius > 0:
-            left_ticks = self.__get_number_ticks(radius + self.d_wheel/2)
-            right_ticks = self.__get_number_ticks(radius - self.d_wheel/2)
-            factor = left_ticks/right_ticks
+            left_ticks = self.__get_number_ticks(math.pi*(radius + self.d_wheel/2))
+            right_ticks = self.__get_number_ticks(math.pi*(radius - self.d_wheel/2))
+            factor = float(left_ticks)/right_ticks
+            print left_ticks
+            print right_ticks
+            print factor
         elif radius < 0:
             left_ticks = self.__get_number_ticks(radius - self.d_wheel/2)
             right_ticks = self.__get_number_ticks(radius + self.d_wheel/2)
             factor = right_ticks/left_ticks
         else:
             if degrees > 0:
-                left_ticks = self.__get_number_ticks(radius + self.d_wheel/2)
-                right_ticks = self.__get_number_ticks(radius - self.d_wheel/2)
+                left_ticks = self.__get_number_ticks(-self.d_wheel/2)
+                right_ticks = self.__get_number_ticks(self.d_wheel/2)
+                factor = left_ticks/right_ticks
             elif degrees < 0:
-                left_ticks = self.__get_number_ticks(radius - self.d_wheel/2)
-                right_ticks = self.__get_number_ticks(radius + self.d_wheel/2)
+                left_ticks = self.__get_number_ticks( self.d_wheel/2)
+                right_ticks = self.__get_number_ticks(-self.d_wheel/2)
+                factor = right_ticks/left_ticks
             else:
                 return
         self.__add_driving_session(left_ticks,right_ticks)
@@ -49,9 +53,12 @@ class Driving(object):
         self.__end_driving_session()
 
     def drive_ticks(self,correction):
-        self.right_motor.set_velocity(200)
-        self.left_motor.set_velocity(200*correction)
+        initial_right = 180
+        initial_left = 180*correction
+        self.right_motor.set_velocity(initial_right)
+        self.left_motor.set_velocity(initial_left)
         while not self.__goal_reached():
+
             # Initialize PID values and constants
             integral = 0
             previous = 0
@@ -61,13 +68,15 @@ class Driving(object):
             ki = 0          # integraal     factor
 
             # Calculate PID values
-            error = self.left_motor.get_encoder_value() - self.right_motor.get_encoder_value()
+            left = self.left_motor.get_encoder_value()
+            right =  self.right_motor.get_encoder_value()
+            error = left*correction - right
             integral = integral + error * 0.05
             derivative = (error - previous) / 0.05
 
             output = kp * error + ki * integral + kd * derivative
             previous = error
-            self.left_motor.set_velocity(200-output)
+            self.left_motor.set_velocity(initial_left-output)
             time.sleep(.05)
 
     def __goal_reached(self):
@@ -75,7 +84,7 @@ class Driving(object):
 
     def __get_number_ticks(self, distance):
         "De waarde TICKSP360 moet gecalibreert worden aan het aantal ticks dat de motoren doen per 360 graden"
-        TICKSP360 = 725
+        TICKSP360 = 800
         return int(distance/self.perimeter_wheel*TICKSP360)
 
     def __start_motors(self):
