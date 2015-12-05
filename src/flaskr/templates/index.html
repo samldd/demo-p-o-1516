@@ -36,11 +36,25 @@
         document.querySelector('input[value=right]').click();
       }
     };
+
+    var newImage = new Image();
+    newImage.src = "{{ url_for('static', filename='last_image.jpg') }}";
+    updateImage();
+    function updateImage()
+    {
+        if(newImage.complete) {
+            document.getElementById("stream").src = newImage.src;
+            newImage = new Image();
+            newImage.src = "{{ url_for('static', filename='last_image.jpg') }}?t=" + new Date().getTime();
+        }
+
+        setTimeout(updateImage, 500);
+    }
     </script>
 </head>
 
 <body>
-    <div style="padding: 20px">
+<div style="float: left; padding-left:20px">
     <h1>request response</h1>
     <iframe name="response_iframe" style="height: 70px; width: 600px" frameBorder="0"></iframe>
     <h1>controls</h1>
@@ -86,10 +100,13 @@
         <input type="submit" name="submit" value="kill" style="display:none">
         <input type="submit" name="submit" value="followline" style="display:none">
     </form>
-        <h1>Picture</h1>
-        <img src="{{ url_for('video_feed') }}">
     <h1>information</h1>
     <iframe src="/info" frameBorder="0" style="height: 150px; width: 680px;"></iframe>
+    </div>
+    <div style="float: left; padding: 0px 20px">
+    <h1>Picture</h1>
+    <!-- <img src="{{ url_for('video_feed') }}"> -->
+    <img id="stream"/>
     </div>
 </body>
 

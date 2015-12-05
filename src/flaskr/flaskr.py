@@ -2,7 +2,9 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify, Response
 #import socket_client
 import interface, sys, traceback
-from camera import Camera
+
+##voor stream
+#from camera import Camera
 
 app = Flask(__name__)
 
