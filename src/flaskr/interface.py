@@ -30,10 +30,10 @@ def debug(f):            # debug decorator takes function f as parameter
         return f(*args)  # call to original function
     return wrapper       # return the wrapper function, without calling it
 
-def forward():
+def forward(motorvalue=200):
     global lastDirectionForward
-    BrickPi.MotorSpeed[PORT_C] = 200    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = 200
+    BrickPi.MotorSpeed[PORT_C] = motorvalue    #Set the speed of MotorA (-255 to 255)
+    BrickPi.MotorSpeed[PORT_B] = motorvalue
     BrickPiUpdateValues()
     lastDirectionForward = True
 
@@ -117,6 +117,12 @@ def picture():
     scale = 4
 
     subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width/scale), "-h", str(height/scale)])
+
+def drive_accelerometer(xValue, yValue):
+    if xValue < -10 and xValue > -50:
+        #vooruit rijden
+        speed = int(float(xValue+50)/40*255)
+        forward(speed)
 
 
 def kill():

@@ -8,6 +8,14 @@ import interface, sys, traceback
 
 app = Flask(__name__)
 
+@app.route('/acc')
+def receive_accelerometer_data():
+    xValue = int(request.args.get('xValue'))
+    print xValue
+    yValue = int(request.args.get('yValue'))
+    interface.drive_accelerometer(xValue, yValue)
+    return "send your accelerometer data here"
+
 @app.route('/info')
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
@@ -24,6 +32,7 @@ def gen(camera):
 def video_feed():
     return Response(gen(Camera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 @app.route('/', methods=['POST', 'GET'])
 def show_index():

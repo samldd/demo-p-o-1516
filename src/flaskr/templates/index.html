@@ -12,6 +12,7 @@
     <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
     <meta http-equiv="pragma" content="no-cache" />
 
+
     <script>
     if (document.layers) {
         document.captureEvents(Event.KEYDOWN);
@@ -37,77 +38,148 @@
       }
     };
 
-    var newImage = new Image();
-    newImage.src = "{{ url_for('static', filename='last_image.jpg') }}";
     updateImage();
     function updateImage()
     {
-        if(newImage.complete) {
+        newImage = new Image();
+
+        newImage.onload = function() {
             document.getElementById("stream").src = newImage.src;
-            newImage = new Image();
-            newImage.src = "{{ url_for('static', filename='last_image.jpg') }}?t=" + new Date().getTime();
-        }
+        };
+        newImage.onerror = function() {
+            document.getElementById("stream").src =  "{{ url_for('static', filename='placeholder.jpg') }}";
+        };
+        newImage.src = "{{ url_for('static', filename='last_image.jpg') }}?t=" + new Date().getTime();
+
 
         setTimeout(updateImage, 500);
     }
+
+    if (window.DeviceOrientationEvent) {
+
+		window.addEventListener("deviceorientation", function(event)
+		{
+
+			var xValue = Math.round(event.gamma);
+			var yValue = Math.round(event.beta);
+			var rotation = Math.round(event.alpha);
+            document.getElementById("accelerometer").innerHTML = "accelerometer data: xValue: " + xValue + "; yValue: " + yValue + "; rotation: " + rotation;
+
+            var includeY = false;
+            var includeX = false;
+            if(yValue < -10 && yValue > -170){
+                //steering left
+                includeY = true;
+            }
+            else if(yValue > 10 && yValue < 170){
+                //steering right
+                includeY = true;
+            }
+
+            if(xValue < -10 && xValue > -50){
+                //steering forward
+                includeX = true;
+            }
+            else if(xValue > 10 && xValue < 80){
+                //steering backward
+                includeX = true;
+            }
+            if(includeX || includeY){
+                var site = '/acc?xValue='+xValue+'&yValue='+yValue;
+                someimg = new Image();
+                someimg.src = site;
+            }
+		}, true);
+	} else {
+	    //alert("Sorry, your browser doesn't support Device Orientation");
+	}
+
     </script>
 </head>
 
 <body>
-<div style="float: left; padding-left:20px">
-    <h1>request response</h1>
-    <iframe name="response_iframe" style="height: 70px; width: 600px" frameBorder="0"></iframe>
-    <h1>controls</h1>
-        <table>
-            <tr>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=sharpleft]').click();"><i class="icon-undo"></i></a></td>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=forward]').click();"><i class="icon-arrow-circle-up"></i></a></td>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=sharpright]').click();"><i class="icon-undo"></i></a></td>
-            </tr>
-            <tr>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=left]').click();"><i class="icon-arrow-circle-left"></i></a></td>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=backward]').click();"><i class="icon-arrow-circle-down"></i></a></td>
-                <td><a class="btn" href="javascript:document.querySelector('input[value=right]').click();"><i class="icon-arrow-circle-right"></i></a></td>
-            </tr>
-        </table>
-        <br>
-        <a class="btn" href="javascript:document.querySelector('input[value=line]').click();"><i class="icon-flag-checkered"></i> Drive line</a><br>
-        <a class="btn" href="javascript:document.querySelector('input[value=square]').click();"><i class="icon-square-o"></i> Drive square</a><br>
-        <a class="btn" href="javascript:document.querySelector('input[value=circle]').click();"><i class="icon-circle-o"></i> Drive circle</a><br>
-        <br>
-        <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
-        <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
-        <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
-        <br>
-        <a class="btn" href="javascript:document.querySelector('input[value=followline]').click();"><i class="icon-flag"></i> follow line</a>
+<div class ="wrapper">
+    <div class ="box"><h1>P&amp;O demo 2015-2016</h1></div>
+
+    <div class="upperboxes">
+        <!-- LEFT PART -->
+        <div style="float: left; width:50%">
+            <div id="upperleftbox" class="box">
+                <h1>Picture</h1>
+                <!-- <img src="{{ url_for('video_feed') }}"> -->
+                <center><img id="stream"/></center>
+            </div>
+        </div>
+
+        <!-- RIGHT PART -->
+        <div style="float: left; width: 50%">
+            <div id="upperrightbox"  class="box">
+                <h1>controls</h1>
+                <table>
+                    <tr>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=sharpleft]').click();"><i class="icon-undo"></i></a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=forward]').click();"><i class="icon-arrow-circle-up"></i></a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=sharpright]').click();"><i class="icon-undo"></i></a></td>
+                    </tr>
+                    <tr>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=left]').click();"><i class="icon-arrow-circle-left"></i></a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=backward]').click();"><i class="icon-arrow-circle-down"></i></a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=right]').click();"><i class="icon-arrow-circle-right"></i></a></td>
+                    </tr>
+                </table>
+                <br>
+                <a class="btn" href="javascript:document.querySelector('input[value=line]').click();"><i class="icon-flag-checkered"></i> Drive line</a><br>
+                <a class="btn" href="javascript:document.querySelector('input[value=square]').click();"><i class="icon-square-o"></i> Drive square</a><br>
+                <a class="btn" href="javascript:document.querySelector('input[value=circle]').click();"><i class="icon-circle-o"></i> Drive circle</a><br>
+                <br>
+                <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
+                <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
+                <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
+                <br>
+                <a class="btn" href="javascript:document.querySelector('input[value=followline]').click();"><i class="icon-flag"></i> follow line</a>
 
 
-    <form method="post" target="response_iframe">
-        <input type="submit" name="submit" value="sharpleft" style="display:none">
-        <input type="submit" name="submit" value="sharpright" style="display:none">
-        <input type="submit" name="submit" value="left" style="display:none">
-        <input type="submit" name="submit" value="backward" style="display:none">
-        <input type="submit" name="submit" value="right" style="display:none">
-        <input type="submit" name="submit" value="forward" style="display:none">
+                <form method="post" target="response_iframe">
+                    <input type="submit" name="submit" value="sharpleft" style="display:none">
+                    <input type="submit" name="submit" value="sharpright" style="display:none">
+                    <input type="submit" name="submit" value="left" style="display:none">
+                    <input type="submit" name="submit" value="backward" style="display:none">
+                    <input type="submit" name="submit" value="right" style="display:none">
+                    <input type="submit" name="submit" value="forward" style="display:none">
 
-        <input type="submit" name="submit" value="line" style="display:none">
-        <input type="submit" name="submit" value="square" style="display:none">
-        <input type="submit" name="submit" value="circle" style="display:none">
+                    <input type="submit" name="submit" value="line" style="display:none">
+                    <input type="submit" name="submit" value="square" style="display:none">
+                    <input type="submit" name="submit" value="circle" style="display:none">
 
-        <input type="submit" name="submit" value="picture" style="display:none">
-        <input type="submit" name="submit" value="stream" style="display:none">
+                    <input type="submit" name="submit" value="picture" style="display:none">
+                    <input type="submit" name="submit" value="stream" style="display:none">
 
-        <input type="submit" name="submit" value="kill" style="display:none">
-        <input type="submit" name="submit" value="followline" style="display:none">
-    </form>
-    <h1>information</h1>
-    <iframe src="/info" frameBorder="0" style="height: 150px; width: 680px;"></iframe>
+                    <input type="submit" name="submit" value="kill" style="display:none">
+                    <input type="submit" name="submit" value="followline" style="display:none">
+                </form>
+            </div>
+        </div>
     </div>
-    <div style="float: left; padding: 0px 20px">
-    <h1>Picture</h1>
-    <!-- <img src="{{ url_for('video_feed') }}"> -->
-    <img id="stream"/>
+
+    <div class="lowerboxes">
+        <!-- LEFT PART -->
+        <div style="float: left; width: 50%">
+            <div class="box">
+                <h1>information</h1>
+                <iframe src="/info" frameBorder="0" style="height: 150px; width: 680px;"></iframe>
+                <p id="accelerometer"></p>
+            </div>
+        </div>
+
+        <!-- RIGHT PART -->
+        <div style="float: left; width: 50%">
+            <div class="box">
+                <h1>request response</h1>
+                <iframe name="response_iframe" style="height: 70px; width: 600px" frameBorder="0"></iframe>
+            </div>
+        </div>
     </div>
+</div>
 </body>
 
 </html>
