@@ -37,10 +37,10 @@ def forward(motorvalue=200):
     BrickPiUpdateValues()
     lastDirectionForward = True
 
-def backward():
+def backward(motorvalue=-200):
     global lastDirectionForward
-    BrickPi.MotorSpeed[PORT_C] = -200    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = -200
+    BrickPi.MotorSpeed[PORT_C] = motorvalue    #Set the speed of MotorA (-255 to 255)
+    BrickPi.MotorSpeed[PORT_B] = motorvalue
     BrickPiUpdateValues()
     lastDirectionForward = False
 
@@ -66,23 +66,17 @@ def sharpright():
             BrickPi.MotorSpeed[PORT_B] = 0
         BrickPiUpdateValues()
 
-def left():
+def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
     if lastDirectionForward:
-        BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = 250
+        BrickPi.MotorSpeed[PORT_C] = leftMotorAbsSpeed    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = rightMotorAbsSpeed
     else:
-        BrickPi.MotorSpeed[PORT_C] = -100    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = -250
+        BrickPi.MotorSpeed[PORT_C] = -leftMotorAbsSpeed    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = -rightMotorAbsSpeed
     BrickPiUpdateValues()
 
 def right():
-    if lastDirectionForward:
-        BrickPi.MotorSpeed[PORT_C] = 250    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = 100
-    else:
-        BrickPi.MotorSpeed[PORT_C] = -250    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = -100
-    BrickPiUpdateValues()
+    left(250,100)
 
 def line():
     pass
@@ -119,10 +113,31 @@ def picture():
     subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width/scale), "-h", str(height/scale)])
 
 def drive_accelerometer(xValue, yValue):
-    if xValue < -10 and xValue > -50:
+    global lastDirectionForward
+    if xValue < -10 and xValue > -80:
+        lastDirectionForward = True
+    elif xValue > 10 and xValue < 80:
+         lastDirectionForward = False
+
+
+    if yValue < -10 and yValue > -80:
+        #steering left
+        speedleftmotor = 0
+        rightmotorspeed = 255-int(float(yValue+80)/70*155)
+        left(speedleftmotor, rightmotorspeed)
+    elif yValue > 10 and yValue < 80:
+        #steering right
+        speed = 100+int(float(yValue-10)/70*155)
+        left(speed, 0)
+    elif xValue < -10 and xValue > -80:
         #vooruit rijden
-        speed = int(float(xValue+50)/40*255)
-        forward(speed)
+        speed = int(float(xValue+80)/70*255)
+        forward(speed) #speed tussen 0 en 255
+    elif xValue > 10 and xValue < 80:
+        #achteruit rijden
+        speed = -255+int(float(xValue-10)/70*255)
+        backward(speed) #speed tussen 0 en -255
+
 
 
 def kill():

@@ -11,7 +11,6 @@ app = Flask(__name__)
 @app.route('/acc')
 def receive_accelerometer_data():
     xValue = int(request.args.get('xValue'))
-    print xValue
     yValue = int(request.args.get('yValue'))
     interface.drive_accelerometer(xValue, yValue)
     return "send your accelerometer data here"
