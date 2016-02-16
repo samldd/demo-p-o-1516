@@ -68,11 +68,11 @@
 
             var includeY = false;
             var includeX = false;
-            if(yValue < -10 && yValue > -170){
+            if(yValue < -10 && yValue > -80){
                 //steering left
                 includeY = true;
             }
-            else if(yValue > 10 && yValue < 170){
+            else if(yValue > 10 && yValue < 80){
                 //steering right
                 includeY = true;
             }
@@ -94,8 +94,34 @@
 
             var c = document.getElementById("a_graph");
             var ctx = c.getContext("2d");
+
+            ctx.clearRect(0,0,c.width,c.height);
+
+            ctx.font="12(px Georgia";
+            ctx.fillText("yValue",120,70);
+            ctx.fillText("80",140,90);
+            ctx.fillText("-80",10,90);
+            ctx.fillText("xValue",85,10);
+            ctx.fillText("-80",55,10);
+            ctx.fillText("80",60,150);
+
+            ctx.fillStyle = 'grey';
+            ctx.fillText("FORWARD",54,30);
+            ctx.fillText("BACKWARD",50,130);
+            ctx.fillText("LEFT",10,100);
+            ctx.fillText("RIGHT",120,100);
+
+            ctx.rect(0, 0, 160, 160);
+            ctx.stroke();
+            ctx.rect(70, 70, 20, 20);
+            ctx.stroke();
+            ctx.rect(0, 80, 160, 0);
+            ctx.stroke();
+            ctx.rect(80, 0, 0, 160);
+            ctx.stroke();
+
             ctx.beginPath();
-            ctx.arc(xValue+170,yValue+80,5,0,2*Math.PI);
+            ctx.arc(yValue+80,xValue+80,5,0,2*Math.PI);
             ctx.stroke();
 		}, true);
 	} else {
@@ -176,38 +202,9 @@
                 <h1>information</h1>
                 <iframe src="/info" frameBorder="0" style="height: 150px; width: 680px;"></iframe>
                 <p id="accelerometer"></p>
-                <canvas id="a_graph" width="340" height="160">
+                <canvas id="a_graph" width="200" height="200">
                     This text is displayed if your browser does not support HTML5 Canvas.
                 </canvas>
-
-                <script>
-
-                var c = document.getElementById("a_graph");
-                var ctx = c.getContext("2d");
-
-                ctx.fillText("yValue",300,70);
-                ctx.fillText("170",320,90);
-                ctx.fillText("-170",10,90);
-                ctx.fillText("xValue",180,10);
-                ctx.fillText("-80",150,10);
-                ctx.fillText("80",150,150);
-
-                ctx.font="20px Georgia";
-                ctx.fillStyle = 'grey';
-                ctx.fillText("FORWARD",120,40);
-                ctx.fillText("BACKWARD",115,130);
-
-
-                ctx.rect(0, 0, 340, 160);
-                ctx.stroke();
-                ctx.rect(160, 70, 20, 20);
-                ctx.stroke();
-                ctx.rect(0, 80, 340, 0);
-                ctx.stroke();
-                ctx.rect(170, 0, 0, 160);
-                ctx.stroke();
-                </script>
-
             </div>
         </div>
 

@@ -1,4 +1,5 @@
 import subprocess, sys, traceback, math
+from motor import Motor
 from time import gmtime, strftime, sleep
 
 if sys.platform != 'win32':
@@ -6,22 +7,9 @@ if sys.platform != 'win32':
 
 from threading import Thread
 
+right_motor = Motor(PORT_B)
+left_motor = Motor(PORT_C)
 lastDirectionForward = True
-
-def setup_brickpi():
-    global referenceB, referenceC
-    BrickPiSetup()  # setup the serial port for communication
-
-    BrickPi.MotorEnable[PORT_C] = 1     #Enable the Motor A
-    BrickPi.MotorEnable[PORT_B] = 1
-    BrickPiSetupSensors()       #Send the properties of sensors to BrickPi
-
-    BrickPiUpdateValues()
-    referenceB = BrickPi.Encoder[PORT_B]
-    referenceC = BrickPi.Encoder[PORT_C]
-
-if sys.platform != 'win32':
-    setup_brickpi()
 
 def debug(f):            # debug decorator takes function f as parameter
     msg = f.__name__     # debug message to print later
@@ -32,8 +20,8 @@ def debug(f):            # debug decorator takes function f as parameter
 
 def forward(motorvalue=200):
     global lastDirectionForward
-    BrickPi.MotorSpeed[PORT_C] = motorvalue    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = motorvalue
+    left_motor = motorvalue    #Set the speed of MotorA (-255 to 255)
+    right_motor = motorvalue
     BrickPiUpdateValues()
     lastDirectionForward = True
 
@@ -114,25 +102,30 @@ def picture():
 
 def drive_accelerometer(xValue, yValue):
     if -10 < yValue < 10 and -10 < xValue < 10:
-		BrickPi.MotorSpeed[PORT_C] = 0
-		BrickPi.MotorSpeed[PORT_B] = 0
-		BrickPiUpdateValues()
-		return #dead zone
+        BrickPi.MotorSpeed[PORT_C] = 0
+        BrickPi.MotorSpeed[PORT_B] = 0
+        BrickPiUpdateValues()
+        return #dead zone
 
-	basePower = 20
-	totalpower = float(abs(xValue)-10)/80*(255-basePower)
+    basePower = 55
+    totalpower = float(abs(xValue)-10)/80*(255-basePower)
 
-	leftMotorFrac = float(yValue+170)/340
-	direction = (-math.copysign(1, xValue)) #1 is vooruit, -1 is achteruit
+    leftMotorFrac = float(yValue+80)/160
+    direction = (-math.copysign(1, xValue)) #1 is vooruit, -1 is achteruit
 
-	if leftMotorFrac >= 0.5:
-		BrickPi.MotorSpeed[PORT_C] = direction*(totalpower+basePower)    #Set the speed of MotorA (-255 to 255)
-		BrickPi.MotorSpeed[PORT_B] = direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower)
-	if leftMotorFrac < 0.5:
-		BrickPi.MotorSpeed[PORT_C] = direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower)
-		BrickPi.MotorSpeed[PORT_B] = direction*(totalpower+basePower)
+    if leftMotorFrac >= 0.5:
+        print "left motor power:" + str(direction*(totalpower+basePower))
+        print "right motor power:" + str(direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower))
+        BrickPi.MotorSpeed[PORT_C] = int(direction*(totalpower+basePower))    #Set the speed of MotorA (-255 to 255)
+        BrickPi.MotorSpeed[PORT_B] = int(direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower))
+    elif leftMotorFrac < 0.5:
+        print "left motor power:" + str(direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower))
+        print "right motor power:" + str(direction*(totalpower+basePower))
 
-	BrickPiUpdateValues()
+        BrickPi.MotorSpeed[PORT_C] = int(direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower))
+        BrickPi.MotorSpeed[PORT_B] = int(direction*(totalpower+basePower))
+
+    BrickPiUpdateValues()
 
 
 def kill():
