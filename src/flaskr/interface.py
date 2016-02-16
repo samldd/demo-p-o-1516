@@ -120,7 +120,7 @@ def drive_accelerometer(xValue, yValue):
 		return #dead zone
 
 
-	totalpower = float(abs(xValue)-10)/80*510
+	totalpower = float(abs(xValue)-10)/80*255
 
 	leftMotorFrac = float(yValue+170)/340
 	BrickPi.MotorSpeed[PORT_C] = (-math.copysign(1, xValue))*leftMotorFrac*totalpower    #Set the speed of MotorA (-255 to 255)
