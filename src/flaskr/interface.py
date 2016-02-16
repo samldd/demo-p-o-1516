@@ -1,14 +1,16 @@
 import subprocess, sys, traceback, math
-from motor import Motor
 from time import gmtime, strftime, sleep
 
 if sys.platform != 'win32':
     from BrickPi import *   #import BrickPi.py file to use BrickPi operations
+    import value_updater
+    vu = value_updater.ValueUpdater()
+    vu.start()
 
-from threading import Thread
+    from motor import Motor
+    right_motor = Motor(PORT_B)
+    left_motor = Motor(PORT_C)
 
-right_motor = Motor(PORT_B)
-left_motor = Motor(PORT_C)
 lastDirectionForward = True
 
 def debug(f):            # debug decorator takes function f as parameter
@@ -19,49 +21,47 @@ def debug(f):            # debug decorator takes function f as parameter
     return wrapper       # return the wrapper function, without calling it
 
 def forward(motorvalue=200):
-    global lastDirectionForward
-    left_motor = motorvalue    #Set the speed of MotorA (-255 to 255)
-    right_motor = motorvalue
-    BrickPiUpdateValues()
+    global lastDirectionForward, left_motor, right_motor
+    left_motor.set_velocity(motorvalue)    #Set the speed of MotorA (-255 to 255)
+    right_motor.set_velocity(motorvalue)
     lastDirectionForward = True
 
 def backward(motorvalue=-200):
-    global lastDirectionForward
-    BrickPi.MotorSpeed[PORT_C] = motorvalue    #Set the speed of MotorA (-255 to 255)
-    BrickPi.MotorSpeed[PORT_B] = motorvalue
-    BrickPiUpdateValues()
+    global lastDirectionForward, left_motor, right_motor
+    left_motor.set_velocity(motorvalue)
+    right_motor.set_velocity(motorvalue)
     lastDirectionForward = False
 
 def sharpleft():
-    startval = BrickPi.Encoder[PORT_C]
-    while abs(BrickPi.Encoder[PORT_C] - startval) < 1000:
+    global left_motor, right_motor
+    startval = left_motor.get_encoder_value()
+    while abs(left_motor.get_encoder_value() - startval) < 1000:
         if lastDirectionForward:
-            BrickPi.MotorSpeed[PORT_C] = 100    #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_B] = 0
+            left_motor.set_velocity(-200)    #Set the speed of MotorA (-255 to 255)
+            right_motor.set_velocity(200)
         else:
-            BrickPi.MotorSpeed[PORT_C] = -100    #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_B] = 0
-        BrickPiUpdateValues()
+            left_motor.set_velocity(200)    #Set the speed of MotorA (-255 to 255)
+            right_motor.set_velocity(-200)
 
 def sharpright():
-    startval = BrickPi.Encoder[PORT_C]
-    while abs(BrickPi.Encoder[PORT_C] - startval) < 1000:
+    global left_motor, right_motor
+    startval = left_motor.get_encoder_value()
+    while abs(left_motor.get_encoder_value() - startval) < 1000:
         if lastDirectionForward:
-            BrickPi.MotorSpeed[PORT_C] = 250    #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_B] = 0
+            left_motor.set_velocity(200)    #Set the speed of MotorA (-255 to 255)
+            right_motor.set_velocity(-200)
         else:
-            BrickPi.MotorSpeed[PORT_C] = -250    #Set the speed of MotorA (-255 to 255)
-            BrickPi.MotorSpeed[PORT_B] = 0
-        BrickPiUpdateValues()
+            left_motor.set_velocity(-200)    #Set the speed of MotorA (-255 to 255)
+            right_motor.set_velocity(200)
 
 def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
+    global left_motor, right_motor
     if lastDirectionForward:
-        BrickPi.MotorSpeed[PORT_C] = leftMotorAbsSpeed    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = rightMotorAbsSpeed
+        left_motor.set_velocity(leftMotorAbsSpeed)
+        right_motor.set_velocity(rightMotorAbsSpeed)
     else:
-        BrickPi.MotorSpeed[PORT_C] = -leftMotorAbsSpeed    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = -rightMotorAbsSpeed
-    BrickPiUpdateValues()
+        left_motor.set_velocity(-leftMotorAbsSpeed)
+        right_motor.set_velocity(-rightMotorAbsSpeed)
 
 def right():
     left(250,100)
@@ -73,11 +73,14 @@ def square():
     pass
 
 def circle():
-    startval = BrickPi.Encoder[PORT_B]
-    while BrickPi.Encoder[PORT_B] - startval < 15000:
-        BrickPi.MotorSpeed[PORT_C] = 175    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = 250
-        BrickPiUpdateValues()
+    global left_motor, right_motor
+    startval = right_motor.get_encoder_value()
+    left_motor.set_velocity(175)    #Set the speed of MotorA (-255 to 255)
+    right_motor.set_velocity(250)
+    while right_motor.get_encoder_value() - startval < 19000:
+        sleep(0)
+    left_motor.set_velocity(0)
+    right_motor.set_velocity(0)
 
 def followline():
     while True:
@@ -101,10 +104,10 @@ def picture():
     subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width/scale), "-h", str(height/scale)])
 
 def drive_accelerometer(xValue, yValue):
+    global left_motor, right_motor
     if -10 < yValue < 10 and -10 < xValue < 10:
-        BrickPi.MotorSpeed[PORT_C] = 0
-        BrickPi.MotorSpeed[PORT_B] = 0
-        BrickPiUpdateValues()
+        left_motor.set_velocity(0)
+        right_motor.set_velocity(0)
         return #dead zone
 
     basePower = 55
@@ -116,17 +119,14 @@ def drive_accelerometer(xValue, yValue):
     if leftMotorFrac >= 0.5:
         print "left motor power:" + str(direction*(totalpower+basePower))
         print "right motor power:" + str(direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower))
-        BrickPi.MotorSpeed[PORT_C] = int(direction*(totalpower+basePower))    #Set the speed of MotorA (-255 to 255)
-        BrickPi.MotorSpeed[PORT_B] = int(direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower))
+        left_motor.set_velocity(int(direction*(totalpower+basePower)))
+        right_motor.set_velocity(int(direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower)))
     elif leftMotorFrac < 0.5:
         print "left motor power:" + str(direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower))
         print "right motor power:" + str(direction*(totalpower+basePower))
 
-        BrickPi.MotorSpeed[PORT_C] = int(direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower))
-        BrickPi.MotorSpeed[PORT_B] = int(direction*(totalpower+basePower))
-
-    BrickPiUpdateValues()
-
+        left_motor.set_velocity(int(direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower)))
+        right_motor.set_velocity(int(direction*(totalpower+basePower)))
 
 def kill():
     if sys.platform == 'win32':
@@ -135,13 +135,12 @@ def kill():
         subprocess.call(["sudo", "killall", "python", "-9"])
 
 def get_debug_info():
+    global left_motor, right_motor
     if sys.platform == 'win32':
         return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
     try:
-        global referenceB, referenceC
-
-        C = BrickPi.Encoder[PORT_C] - referenceC  # print the encoder degrees
-        B = BrickPi.Encoder[PORT_B] - referenceB
+        C = left_motor.get_encoder_value()  # print the encoder degrees
+        B = right_motor.get_encoder_value()
 
         debuginfo = "it is now: %s<br><br>"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
         debuginfo+= "motor left encoder: " + str(C)

@@ -67,6 +67,8 @@ def show_index():
                 interface.stream()
             elif request.form['submit'] == 'followline':
                 interface.followline()
+            elif request.form['submit'] == 'stopdriving':
+                interface.forward(0)
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:
