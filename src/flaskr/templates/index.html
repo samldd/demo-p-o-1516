@@ -14,6 +14,7 @@
 
 
     <script>
+
     if (document.layers) {
         document.captureEvents(Event.KEYDOWN);
     }
@@ -89,6 +90,13 @@
                 someimg = new Image();
                 someimg.src = site;
             }
+
+
+            var c = document.getElementById("a_graph");
+            var ctx = c.getContext("2d");
+            ctx.beginPath();
+            ctx.arc(xValue+170,yValue+80,5,0,2*Math.PI);
+            ctx.stroke();
 		}, true);
 	} else {
 	    //alert("Sorry, your browser doesn't support Device Orientation");
@@ -168,6 +176,38 @@
                 <h1>information</h1>
                 <iframe src="/info" frameBorder="0" style="height: 150px; width: 680px;"></iframe>
                 <p id="accelerometer"></p>
+                <canvas id="a_graph" width="340" height="160">
+                    This text is displayed if your browser does not support HTML5 Canvas.
+                </canvas>
+
+                <script>
+
+                var c = document.getElementById("a_graph");
+                var ctx = c.getContext("2d");
+
+                ctx.fillText("yValue",300,70);
+                ctx.fillText("170",320,90);
+                ctx.fillText("-170",10,90);
+                ctx.fillText("xValue",180,10);
+                ctx.fillText("-80",150,10);
+                ctx.fillText("80",150,150);
+
+                ctx.font="20px Georgia";
+                ctx.fillStyle = 'grey';
+                ctx.fillText("FORWARD",120,40);
+                ctx.fillText("BACKWARD",115,130);
+
+
+                ctx.rect(0, 0, 340, 160);
+                ctx.stroke();
+                ctx.rect(160, 70, 20, 20);
+                ctx.stroke();
+                ctx.rect(0, 80, 340, 0);
+                ctx.stroke();
+                ctx.rect(170, 0, 0, 160);
+                ctx.stroke();
+                </script>
+
             </div>
         </div>
 

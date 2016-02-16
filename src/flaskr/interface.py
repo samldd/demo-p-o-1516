@@ -1,4 +1,4 @@
-import subprocess, sys, traceback
+import subprocess, sys, traceback, math
 from time import gmtime, strftime, sleep
 
 if sys.platform != 'win32':
@@ -113,31 +113,20 @@ def picture():
     subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width/scale), "-h", str(height/scale)])
 
 def drive_accelerometer(xValue, yValue):
-    global lastDirectionForward
-    if xValue < -10 and xValue > -80:
-        lastDirectionForward = True
-    elif xValue > 10 and xValue < 80:
-         lastDirectionForward = False
+    if -10 < yValue < 10 and -10 < xValue < 10:
+		BrickPi.MotorSpeed[PORT_C] = 0
+		BrickPi.MotorSpeed[PORT_B] = 0
+		BrickPiUpdateValues()
+		return #dead zone
 
 
-    if yValue < -10 and yValue > -80:
-        #steering left
-        speedleftmotor = 0
-        rightmotorspeed = 255-int(float(yValue+80)/70*155)
-        left(speedleftmotor, rightmotorspeed)
-    elif yValue > 10 and yValue < 80:
-        #steering right
-        speed = 100+int(float(yValue-10)/70*155)
-        left(speed, 0)
-    elif xValue < -10 and xValue > -80:
-        #vooruit rijden
-        speed = int(float(xValue+80)/70*255)
-        forward(speed) #speed tussen 0 en 255
-    elif xValue > 10 and xValue < 80:
-        #achteruit rijden
-        speed = -255+int(float(xValue-10)/70*255)
-        backward(speed) #speed tussen 0 en -255
+	totalpower = float(abs(xValue)-10)/80*255
 
+	leftMotorFrac = float(yValue+170)/340
+	BrickPi.MotorSpeed[PORT_C] = (-math.copysign(1, xValue))*leftMotorFrac*totalpower    #Set the speed of MotorA (-255 to 255)
+	BrickPi.MotorSpeed[PORT_B] = (-math.copysign(1, xValue))*(1-leftMotorFrac)*totalpower
+
+	BrickPiUpdateValues()
 
 
 def kill():
