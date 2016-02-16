@@ -1,30 +1,53 @@
 from BrickPi import *
-import motorSession
 import time
 
 class Motor(object):
     def __init__(self, port):
         BrickPiSetup()
-        BrickPiSetupSensors()
-        self.motorSession = None
+        self.velocity = 0
         self.port = port
+        self.enable_motor()
+        self.encoder_reference = BrickPi.Encoder[port]
+
+    def set_velocity(self,velocity):
+        if not(type(velocity) == int):
+            velocity = int(velocity)
+        self.velocity = max(-250, min(velocity, 250)) # bereik snelheid [-255,255]
+        BrickPi.MotorSpeed[self.port] = velocity
+
+    def get_encoder_value(self):
+        current_ticks = BrickPi.Encoder[self.port]
+        if current_ticks == 0 and not(current_ticks == self.encoder_reference):
+            self.port_switch()
+            current_ticks = BrickPi.Encoder[self.port]
+        new_val = current_ticks - self.encoder_reference
+        return new_val
+
+    def reset_motor(self):
+        self.encoder_reference = self.get_encoder_value()
 
     def enable_motor(self):
         BrickPi.MotorEnable[self.port] = 1
+        BrickPiSetupSensors()
         time.sleep(0.10)
-        self.motorSession = motorSession.MotorSession(self.port)
 
     def disable_motor(self):
-        self.motorSession.end_session()
-        BrickPi.MotorEnable[self.port] = 0
+        self.stop()
+        MotorEnable[self.port] = 0
 
-    def get_encoder_value(self):
-        encoder = self.motorSession.get_session_encoder()
-        return encoder
+    def stop(self):
+        self.set_velocity(-self.velocity)
+        time.sleep(0.05)
+        self.set_velocity(0)
 
-    def get_velocity(self):
-        return self.motorSession.get_velocity()
-
-    def set_velocity(self,velocity):
-        self.motorSession.set_velocity(velocity)
+    def port_switch(self):
+        print "!!!!!!!!!!  PORT SWITCH  !!!!!!!!!!!!!"
+        if self.port == 0:
+            self.port = 2
+        elif self.port == 1:
+            self.port = 3
+        elif self.port == 2:
+            self.port = 0
+        elif self.port == 3:
+            self.port = 1
 
