@@ -119,12 +119,18 @@ def drive_accelerometer(xValue, yValue):
 		BrickPiUpdateValues()
 		return #dead zone
 
-
-	totalpower = float(abs(xValue)-10)/80*255
+	basePower = 20
+	totalpower = float(abs(xValue)-10)/80*(255-basePower)
 
 	leftMotorFrac = float(yValue+170)/340
-	BrickPi.MotorSpeed[PORT_C] = (-math.copysign(1, xValue))*leftMotorFrac*totalpower    #Set the speed of MotorA (-255 to 255)
-	BrickPi.MotorSpeed[PORT_B] = (-math.copysign(1, xValue))*(1-leftMotorFrac)*totalpower
+	direction = (-math.copysign(1, xValue)) #1 is vooruit, -1 is achteruit
+
+	if leftMotorFrac >= 0.5:
+		BrickPi.MotorSpeed[PORT_C] = direction*(totalpower+basePower)    #Set the speed of MotorA (-255 to 255)
+		BrickPi.MotorSpeed[PORT_B] = direction*((1-leftMotorFrac)*(totalpower/leftMotorFrac)+basePower)
+	if leftMotorFrac < 0.5:
+		BrickPi.MotorSpeed[PORT_C] = direction*(leftMotorFrac)*(totalpower/(1-leftMotorFrac)+basePower)
+		BrickPi.MotorSpeed[PORT_B] = direction*(totalpower+basePower)
 
 	BrickPiUpdateValues()
 
