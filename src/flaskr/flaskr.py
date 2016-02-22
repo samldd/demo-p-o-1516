@@ -2,9 +2,11 @@ from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify, Response
 #import socket_client
 import interface, sys, traceback
+import photo_recognition
+import time
 
 ##voor stream
-#from camera import Camera
+from camera import Camera
 
 app = Flask(__name__)
 
@@ -20,17 +22,18 @@ def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
 
 
-
 def gen(camera):
     while True:
-        frame = camera.get_frame()
+        a = camera.get_frame()
+        frame = photo_recognition.detect_lines(a)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        time.sleep(0)
+
 
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(Camera()),
-                    mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(Camera()),mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -79,6 +82,6 @@ def show_index():
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
-        app.run()
+        app.run(debug=False,threaded=True)
     else:
         app.run(host='0.0.0.0')

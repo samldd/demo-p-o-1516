@@ -2,12 +2,13 @@ import time
 import io
 import threading
 import picamera
+import photo_recognition
 
 
 class Camera(object):
-    thread = None  # background thread that reads frames from camera
-    frame = None  # current frame is stored here by background thread
-    last_access = 0  # time of last client access to the camera
+    thread = None       # background thread that reads frames from camera
+    frame = None        # current frame is stored here by background thread
+    last_access = 0     # time of last client access to the camera
 
     def initialize(self):
         if Camera.thread is None:
@@ -28,23 +29,21 @@ class Camera(object):
     def _thread(cls):
         with picamera.PiCamera() as camera:
             # camera setup
-            camera.resolution = (320, 240)
+            camera.resolution = (640, 480)
             camera.hflip = False
-            camera.vflip = True
+            camera.vflip = False
 
             stream = io.BytesIO()
-            for foo in camera.capture_continuous(stream, 'jpeg',
-                                                 use_video_port=True):
+            for foo in camera.capture_continuous(stream, 'jpeg',use_video_port=True):
                 # store frame
                 stream.seek(0)
                 cls.frame = stream.read()
-
                 # reset stream for next frame
                 stream.seek(0)
                 stream.truncate()
 
                 # if there hasn't been any clients asking for frames in
                 # the last 10 seconds stop the thread
-                if time.time() - cls.last_access > 10:
+                if time.time() - cls.last_access > 1:
                     break
         cls.thread = None

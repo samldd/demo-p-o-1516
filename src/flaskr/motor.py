@@ -17,7 +17,7 @@ class Motor(object):
 
     def get_encoder_value(self):
         current_ticks = BrickPi.Encoder[self.port]
-        if current_ticks == 0 and not(current_ticks == self.encoder_reference):
+        while current_ticks == 0 and not(current_ticks == self.encoder_reference):
             self.port_switch()
             current_ticks = BrickPi.Encoder[self.port]
         new_val = current_ticks - self.encoder_reference
@@ -41,7 +41,7 @@ class Motor(object):
         self.set_velocity(0)
 
     def port_switch(self):
-        print "!!!!!!!!!!  PORT SWITCH  !!!!!!!!!!!!!"
+        print "!!!!!!!!!!  PORT SWITCH : PORT %s !!!!!!!!!!!!!" %self.port
         if self.port == 0:
             self.port = 2
         elif self.port == 1:
@@ -50,4 +50,5 @@ class Motor(object):
             self.port = 0
         elif self.port == 3:
             self.port = 1
+        print "NEW PORT: %s" %self.port
 

@@ -1,13 +1,18 @@
-import subprocess, sys, traceback, math
+import subprocess
+import sys
+import traceback
+import math
 from time import gmtime, strftime, sleep
+import robo_car
+import line_follower
 
 if sys.platform != 'win32':
-    from BrickPi import *   #import BrickPi.py file to use BrickPi operations
-    import value_updater
+    from src.flaskr import value_updater
+
     vu = value_updater.ValueUpdater()
     vu.start()
 
-    from motor import Motor
+    from src.flaskr.motor import Motor
     right_motor = Motor(PORT_B)
     left_motor = Motor(PORT_C)
 
@@ -66,12 +71,6 @@ def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
 def right():
     left(250,100)
 
-def line():
-    pass
-
-def square():
-    pass
-
 def circle():
     global left_motor, right_motor
     startval = right_motor.get_encoder_value()
@@ -84,10 +83,9 @@ def circle():
 
 def followline():
     while True:
-        picture()
-        #BEREKEN HOEK met code in find_line.py
-        #draai juiste hoek
-        #rij rechtdoor
+        rob = robo_car.RoboCar(rob)
+        lf = line_follower.Follower()
+        lf.run()
 
 def stream():
     time = 20 #stream time in seconds
@@ -100,7 +98,6 @@ def picture():
     width =2592
     height=1944
     scale = 4
-
     subprocess.call(["raspistill", "-o", "/home/pi/robot/flaskr/static/last_image.jpg", "-t", "1", "-n", "-w", str(width/scale), "-h", str(height/scale)])
 
 def drive_accelerometer(xValue, yValue):
