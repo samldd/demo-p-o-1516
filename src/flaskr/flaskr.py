@@ -24,8 +24,8 @@ def show_pi_information():
 
 def gen(camera):
     while True:
-        a = camera.get_frame()
-        frame = photo_recognition.detect_lines(a)
+        frame = camera.get_frame()
+        #frame = photo_recognition.detect_lines(a)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         time.sleep(0)
@@ -56,12 +56,6 @@ def show_index():
                 interface.sharpleft()
             elif request.form['submit'] == 'sharpright':
                 interface.sharpright()
-            elif request.form['submit'] == 'line':
-                interface.line()
-            elif request.form['submit'] == 'square':
-                interface.square()
-            elif request.form['submit'] == 'circle':
-                interface.circle()
             elif request.form['submit'] == 'kill':
                 interface.kill()
             elif request.form['submit'] == 'picture':
@@ -70,6 +64,8 @@ def show_index():
                 interface.stream()
             elif request.form['submit'] == 'followline':
                 interface.followline()
+            elif request.form['submit'] == 'manual':
+                interface.manual()
             elif request.form['submit'] == 'stopdriving':
                 interface.forward(0)
             else:
@@ -84,4 +80,4 @@ if __name__ == '__main__':
     if sys.platform == 'win32':
         app.run(debug=False,threaded=True)
     else:
-        app.run(host='0.0.0.0')
+        app.run(host='0.0.0.0', debug=False,threaded=True)
