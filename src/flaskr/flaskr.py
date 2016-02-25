@@ -22,7 +22,7 @@ def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
 
 
-def gen(camera):
+def gen(camera, oneFrame = False):
     while True:
         frame = camera.get_frame()
         #frame = photo_recognition.detect_lines(a)
@@ -31,9 +31,17 @@ def gen(camera):
         time.sleep(0)
 
 
+
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(Camera()),mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/video_frame')
+def get_video_frame():
+    frame = Camera().get_frame()
+    responsebody = (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n');
+    return Response(responsebody, mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 @app.route('/', methods=['POST', 'GET'])
