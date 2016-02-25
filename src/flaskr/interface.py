@@ -120,8 +120,11 @@ def kill():
     else:
         subprocess.call(["sudo", "killall", "python", "-9"])
 
+
+commandQueue = []
+
 def get_debug_info():
-    global left_motor, right_motor
+    global left_motor, right_motor, commandQueue
     if sys.platform == 'win32':
         return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
     try:
@@ -131,14 +134,28 @@ def get_debug_info():
         style100 = "style=\"width:100" + "%" + "\""
         debuginfo = "<table  " + style100 + "><tr><td>motor left encoder: %s</td><td style=\"text-align: right\">time: %s</td></tr>" % (C, strftime("%H:%M:%S", gmtime()))
         debuginfo += "<tr><td colspan=\"2\">motor right encoder: %s</td></tr></table>" % B
+
+        if commandQueue:
+            debuginfo += "<p>command queue: " + commandQueue[0]
+
+            for command in commandQueue[1:]:
+                debuginfo+= " -> " + command
+            debuginfo += "</p>"
+        else:
+            debuginfo += "command queue is empty, click \"next crossroad X\" to give directions to the robot."
         return debuginfo
     except:
         return traceback.format_exc().replace('\n', '<br />')
 
+def addCommand(command):
+    global commandQueue
+    commandQueue.append(command)
 
-
-
-
+def getNextCommand():
+    global commandQueue
+    rv = commandQueue[0]
+    commandQueue = commandQueue[1:]
+    return rv
 
 
 

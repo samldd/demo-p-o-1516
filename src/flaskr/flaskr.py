@@ -68,6 +68,12 @@ def show_index():
                 interface.manual()
             elif request.form['submit'] == 'stopdriving':
                 interface.forward(0)
+            elif request.form['submit'] == 'nextleft':
+                interface.addCommand("left")
+            elif request.form['submit'] == 'nextforward':
+                interface.addCommand("forward")
+            elif request.form['submit'] == 'nextright':
+                interface.addCommand("right")
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:

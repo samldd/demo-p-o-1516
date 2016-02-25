@@ -122,7 +122,7 @@
 
 <body>
 <div class ="wrapper">
-    <div class ="box"><h1>P&amp;O demo 2015-2016</h1></div>
+    <div class ="box" style="padding: 5px;"><h1>P&amp;O demo 2015-2016</h1></div>
 
     <div class="upperboxes">
         <!-- LEFT PART -->
@@ -136,9 +136,11 @@
         <!-- RIGHT PART -->
         <div style="float: left; width: 50%">
             <div id="upperrightbox" class="box">
-                <h1>controls</h1>
+                <h1>Manual controls</h1>
                 <table width="100%">
                     <tr width="100%"><td>
+                        <a class="btn" href="javascript:document.querySelector('input[value=manual]').click();"><i class="icon-flag"></i> drive manual</a>
+                        <p style="margin-top:10px; margin-bottom:0px">INFO: the keyboard arrows also work (any other key to brake)</p>
                         <table>
                             <tr>
                                 <td><a class="btn" href="javascript:document.querySelector('input[value=sharpleft]').click();"><i class="icon-undo"></i></a></td>
@@ -153,32 +155,12 @@
                             <tr><td colspan="3"><a class="btn" href="javascript:document.querySelector('input[value=stopdriving]').click();"><i class="icon-flag-checkered"></i> brake</a></td></tr>
                         </table>
                         <br>
-                        <a class="btn" href="javascript:document.querySelector('input[value=followline]').click();"><i class="icon-flag"></i> follow line</a>
-                        <a class="btn" href="javascript:document.querySelector('input[value=manual]').click();"><i class="icon-flag"></i> drive manual</a>
-                        <br>
-                        <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
+
 
                         <!--
                         <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
                         <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
                         -->
-
-                        <form method="post" target="response_iframe">
-                            <input type="submit" name="submit" value="sharpleft" style="display:none">
-                            <input type="submit" name="submit" value="sharpright" style="display:none">
-                            <input type="submit" name="submit" value="left" style="display:none">
-                            <input type="submit" name="submit" value="backward" style="display:none">
-                            <input type="submit" name="submit" value="right" style="display:none">
-                            <input type="submit" name="submit" value="forward" style="display:none">
-
-                            <input type="submit" name="submit" value="picture" style="display:none">
-                            <input type="submit" name="submit" value="stream" style="display:none">
-
-                            <input type="submit" name="submit" value="kill" style="display:none">
-                            <input type="submit" name="submit" value="followline" style="display:none">
-                            <input type="submit" name="submit" value="manual" style="display:none">
-                            <input type="submit" name="submit" value="stopdriving" style="display:none">
-                        </form>
                     </td>
                     <td style="text-align: right">
                         <p id="accelerometer"></p>
@@ -187,6 +169,21 @@
                         </canvas>
                     </td></tr>
                 </table>
+                <h1>Automatic driving</h1>
+                <a class="btn" href="javascript:document.querySelector('input[value=followline]').click();"><i class="icon-flag"></i> drive automatic (follow line)</a>
+                <p style="margin-top:10px; margin-bottom:0px">INFO: These commands will add an action to the queue of intended actions of the robot</p>
+                <table>
+                    <tr>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=nextleft]').click();"><i class="icon-arrow-circle-left"></i> next crossroad left</a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=nextforward]').click();"><i class="icon-arrow-circle-up"></i> next crossroad forward</a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=nextright]').click();"><i class="icon-arrow-circle-right"></i> next crossroad right</a></td>
+                    </tr>
+                </table>
+                <h1>Other</h1>
+                <p style="margin-top:10px; margin-bottom:0px">INFO: This command stops all python processes on the robot (including webserver hosting this page). Use <i>sudo python ~/robot/flaskr/flaskr.py</i> to restart.</p>
+                <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
+                <br>
+
             </div>
         </div>
     </div>
@@ -195,7 +192,8 @@
         <div style="float: left; width: 50%">
             <div class="box">
                 <h1>information</h1>
-                <iframe src="/info" frameBorder="0" style="overflow:hidden; height: 70px; width: 100%;"></iframe>
+                <p>INFO: encoder value represents the amount of half degrees a wheel has turned.</p>
+                <iframe src="/info" frameBorder="0" style="overflow:hidden; height: 120px; width: 100%;"></iframe>
             </div>
         </div>
 
@@ -208,6 +206,28 @@
         </div>
     </div>
 </div>
+
+
+<form method="post" target="response_iframe">
+    <input type="submit" name="submit" value="sharpleft" style="display:none">
+    <input type="submit" name="submit" value="sharpright" style="display:none">
+    <input type="submit" name="submit" value="left" style="display:none">
+    <input type="submit" name="submit" value="backward" style="display:none">
+    <input type="submit" name="submit" value="right" style="display:none">
+    <input type="submit" name="submit" value="forward" style="display:none">
+
+    <input type="submit" name="submit" value="nextleft" style="display:none">
+    <input type="submit" name="submit" value="nextforward" style="display:none">
+    <input type="submit" name="submit" value="nextright" style="display:none">
+
+    <input type="submit" name="submit" value="picture" style="display:none">
+    <input type="submit" name="submit" value="stream" style="display:none">
+
+    <input type="submit" name="submit" value="kill" style="display:none">
+    <input type="submit" name="submit" value="followline" style="display:none">
+    <input type="submit" name="submit" value="manual" style="display:none">
+    <input type="submit" name="submit" value="stopdriving" style="display:none">
+</form>
 </body>
 
 </html>
