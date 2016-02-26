@@ -30,10 +30,7 @@ def get_line_param(points,vertical=True):
     return (480-b)/a , (240-b)/a
 
 def detect_lines(im):
-    resX = 400
-    resY = 300
-    im_gray = cv2.imdecode(np.fromstring(im, np.uint8),cv2.CV_LOAD_IMAGE_GRAYSCALE)
-    im = cv2.imdecode(np.fromstring(im, np.uint8),cv2.CV_LOAD_IMAGE_COLOR)
+    im_gray = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
 
     blur = cv2.GaussianBlur(im_gray,(9,9),0)
 
@@ -41,7 +38,7 @@ def detect_lines(im):
     imthresh = cv2.morphologyEx(imthresh, 1, kernel = np.ones((3,3),np.uint8))
 
     pointsX = []
-    for i in xrange(0,resY,20):
+    for i in xrange(0,480,20):
         li = imthresh[i,300-i/2:340+i/2]
         nonzero = np.nonzero(li)[0]
         if len(nonzero):
@@ -111,7 +108,10 @@ def detect_lines(im):
         res = (res[0],res[1])
         cv2.circle(im,(int(res[0]),480),1,(0,255,255),thickness=20)
         cv2.circle(im,(int(res[1]),240),1,(0,255,255),thickness=20)
+        cv2.line(im,(int(res[0]),480),(int(res[1]),240),(0,255,255))
 
     im = cv2.imencode(".jpg",im)[1].tostring()
-
-    return im
+    if res:
+        return im,res[1]
+    else:
+        return im, None

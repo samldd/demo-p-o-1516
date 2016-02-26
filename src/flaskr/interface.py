@@ -84,7 +84,7 @@ def right():
     if drive_manual:
         left(250,100)
 
-def followline():
+def drive_auto():
     global drive_manual
     drive_manual = False
 
@@ -158,7 +158,8 @@ def getNextCommand():
     return rv
 
 
-
+def follow_line(x):
+    pass
 
 
 

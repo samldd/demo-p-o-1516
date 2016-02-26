@@ -33,6 +33,7 @@ class Camera(object):
             camera.hflip = False
             camera.vflip = False
 
+
             stream = io.BytesIO()
             for foo in camera.capture_continuous(stream, 'jpeg',use_video_port=True):
                 # store frame
@@ -44,6 +45,6 @@ class Camera(object):
 
                 # if there hasn't been any clients asking for frames in
                 # the last 10 seconds stop the thread
-                if time.time() - cls.last_access > 1:
+                if time.time() - cls.last_access > 10:
                     break
         cls.thread = None

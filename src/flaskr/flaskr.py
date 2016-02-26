@@ -17,6 +17,14 @@ def receive_accelerometer_data():
     interface.drive_accelerometer(xValue, yValue)
     return "send your accelerometer data here"
 
+@app.route('/line_info')
+def receive_line_following_info():
+    x = request.args.get('x')
+    print x
+    if x != "None":
+        interface.follow_line(float(x))
+    return "send your line data here"
+
 @app.route('/info')
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
@@ -28,20 +36,21 @@ def gen(camera, oneFrame = False):
         #frame = photo_recognition.detect_lines(a)
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        time.sleep(0)
+        time.sleep(0.15)
 
+@app.route('/hello_world')
+def hello_world():
+    return "hello world"
 
-
+cam = Camera()
 @app.route('/video_feed')
 def video_feed():
-    return Response(gen(Camera()),mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(gen(cam),mimetype='multipart/x-mixed-replace; boundary=frame')
 
-@app.route('/video_frame')
+@app.route('/video_frame.jpg')
 def get_video_frame():
-    frame = Camera().get_frame()
-    responsebody = (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n');
-    return Response(responsebody, mimetype='multipart/x-mixed-replace; boundary=frame')
+    frame = cam.get_frame()
+    return Response(frame, mimetype='image/jpeg')
 
 
 @app.route('/', methods=['POST', 'GET'])
@@ -71,7 +80,7 @@ def show_index():
             elif request.form['submit'] == 'stream':
                 interface.stream()
             elif request.form['submit'] == 'followline':
-                interface.followline()
+                interface.drive_auto()
             elif request.form['submit'] == 'manual':
                 interface.manual()
             elif request.form['submit'] == 'stopdriving':
