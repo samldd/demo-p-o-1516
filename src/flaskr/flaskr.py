@@ -20,9 +20,7 @@ def receive_accelerometer_data():
 @app.route('/line_info')
 def receive_line_following_info():
     x = request.args.get('x')
-    print x
-    if x != "None":
-        interface.follow_line(float(x))
+    interface.follow_line(x)
     return "send your line data here"
 
 @app.route('/info')

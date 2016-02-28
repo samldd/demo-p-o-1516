@@ -31,16 +31,15 @@ class FileFetcher(object):
     def _thread(cls):
         while True:
             req = urllib.urlopen(url).read()
-
             file = cStringIO.StringIO(req)
-
 
             img = Image.open(file)
             opencv_image = np.array(img)
             opencv_image = opencv_image[:,:,::-1]
-            #cls.frame, x = photo_recognition.detect_lines(opencv_image)
-            cls.frame = opencv_image
-            #urllib.urlopen("http://192.168.42.1:5000/line_info?x="+str(x))
+            cls.frame, x = photo_recognition.detect_lines(opencv_image)
+            #cls.frame = opencv_image
+            print str(x)
+            urllib.urlopen("http://192.168.42.1:5000/line_info?x="+str(x))
 
             # if there hasn't been any clients asking for frames in
             # the last 10 seconds stop the thread
