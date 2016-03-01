@@ -17,8 +17,8 @@ class Driving(threading.Thread):
         self.d_wheel = 0.145
         self.perimeter_wheel = 0.055 * math.pi
 
-        self.left_motor = motor.Motor(BrickPi.PORT_C)
-        self.right_motor = motor.Motor(BrickPi.PORT_B)
+        self.left_motor = motor.Motor(BrickPi.PORT_B)
+        self.right_motor = motor.Motor(BrickPi.PORT_C)
 
         self.left_speed = 0
         self.right_speed = 0
@@ -48,13 +48,12 @@ class Driving(threading.Thread):
             self.factor = (2.5-(radius-20)*0.038)
             self.left_speed = self.default_speed*self.factor
             self.right_speed = self.default_speed
-        print "factor: %s" %self.factor
-        print "speed: %s" %self.default_speed
 
     def get_driven_distance(self):
         Ticks360 = 700
         factor = self.perimeter_wheel/Ticks360
         left = (self.left_motor.get_encoder_value() - self.left_ticks)*factor
+        print left
         right = (self.right_motor.get_encoder_value() - self.right_ticks)*factor
         return left,right
 
@@ -90,19 +89,23 @@ class Driving(threading.Thread):
         self.stop_driving()
         self.factor = 0
         self.direction = "turning"
-        wheel_degrees = 2 * self.d_wheel * math.pi * degrees / self.perimeter_wheel
+        wheel_degrees = self.d_wheel * math.pi * degrees/360
+        print "wheel degree: %s" %abs(wheel_degrees)
         speed = 130 if wheel_degrees >= 0 else -130
         self.left_motor.set_velocity(speed)
         self.right_motor.set_velocity(-speed)
+        self.reset()
         while True:
             time.sleep(0.05)
-            if abs(self.left_motor.get_encoder_value()) > abs(wheel_degrees) or abs(self.right_motor.get_encoder_value()) > abs(wheel_degrees):
+            left,right = self.get_driven_distance()
+            print "%s,%s" %(left,right)
+            if left > abs(wheel_degrees) or right > abs(wheel_degrees):
                 self.stop_driving()
                 break
 
     def reset(self):
-        self.ticks_left = self.left_motor.get_encoder_value()
-        self.ticks_right = self.right_motor.get_encoder_value()
+        self.left_ticks = self.left_motor.get_encoder_value()
+        self.right_ticks = self.right_motor.get_encoder_value()
 
     def run(self):
         self.__start_motors()

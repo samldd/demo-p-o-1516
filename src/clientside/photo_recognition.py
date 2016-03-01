@@ -183,7 +183,12 @@ def detect_lines(im):
         cv2.line(im,(320,mid),(640,under),(0,255,255))
 
     if len(pointsXUp) > 0:
-        response[3] = True
+        mid,angle = get_line_param(pointsXUp)
+        upper = int(mid-math.tan(3.14/2-angle/180*3.14)*240)
+        angle = 90+angle if angle < 0 else -90+angle
+        response[3] = (int(mid),angle)
+        cv2.circle(im,(mid,240),1,(255,255,255),thickness=10)
+        cv2.line(im,(mid,240),(upper,0),(255,255,255))
 
     for i in range(0,100,10):
         im[i:i+1,:] = (0,255,0)
@@ -204,6 +209,8 @@ def detect_lines(im):
     for point in pointsYr:
         cv2.circle(im,point,1,(0,0,255),thickness=4)
 
-    print response
+    with open('debug.txt' ,"a") as tf:
+            tf.write(str(response) + "\n")
+
     im = cv2.imencode(".jpg",im)[1].tostring()
     return im,response

@@ -1,18 +1,16 @@
 import time
 import math
-
 import driving
-import value_updater
-import camera
+import follow_controller
 
 
 class RoboCar(object):
     def __init__(self):
-        self.value_updater = value_updater.ValueUpdater()
-        self.value_updater.start()
         self.driving = driving.Driving()
         self.driving.start()
-        self.camera = camera.Camera()
+        self.lineController = follow_controller.Follower(self.driving,self)
+        self.lineController.start()
+        self.lineInfo = None
     
     def drive_straight(self, distance):
         print "drive forward"
@@ -61,18 +59,8 @@ class RoboCar(object):
                 (_,right) = self.driving.get_driven_distance()
         self.driving.stop_driving()
 
-    def corrigate(self,factor):
-        print "corrigate with factor: %s" %factor
-        if math.fabs(factor) > 50:
-            self.driving.drive_straight()
-        elif math.fabs(factor) < 20:
-            self.driving.stop_driving()
-        else:
-            self.driving.drive_arc(factor)
-
-    def get_picture(self):
-        return self.camera.get_frame()
+    def follow_the_line(self,factor):
+        self.lineController.set_camera_info(factor)
 
     def halt(self):
         self.driving.stop_driving()
-        self.value_updater.stop()
