@@ -115,17 +115,24 @@
 	}
 
 	switchStream();
+	var laatsteWasLoad = false;
     function switchStream()
     {
         newImage = new Image();
 
         newImage.onload = function() {
-            document.getElementById("stream").src = "http://127.0.0.1:5000/video_feed";
-            document.getElementById("streamtitle").innerHTML = "Stream - Image processing client active";
+            if(!laatsteWasLoad){
+                document.getElementById("stream").src = "http://127.0.0.1:5000/video_feed";
+                document.getElementById("streamtitle").innerHTML = "Stream - Image processing client active";
+            }
+            laatsteWasLoad=true;
         };
         newImage.onerror = function() {
-            document.getElementById("stream").src =  "{{ url_for('video_feed') }}";
-            document.getElementById("streamtitle").innerHTML = "Stream - Image processing client down";
+            if(laatsteWasLoad){
+                document.getElementById("stream").src =  "{{ url_for('video_feed') }}";
+                document.getElementById("streamtitle").innerHTML = "Stream - Image processing client down";
+            }
+            laatsteWasLoad = false;
         };
         newImage.src = "http://127.0.0.1:5000/video_frame.jpg?t=" + new Date().getTime();
         setTimeout(switchStream, 1000);
