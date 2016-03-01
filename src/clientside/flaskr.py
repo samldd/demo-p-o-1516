@@ -7,6 +7,8 @@ import time
 
 
 app = Flask(__name__)
+fetcher = FileFetcher()
+fetcher.initialize()
 
 def gen(filefetcher, oneFrame = False):
     while True:
@@ -17,7 +19,7 @@ def gen(filefetcher, oneFrame = False):
 
 @app.route('/video_feed')
 def video_feed():
-    response = Response(gen(FileFetcher()),mimetype='multipart/x-mixed-replace; boundary=frame')
+    response = Response(gen(),mimetype='multipart/x-mixed-replace; boundary=frame')
     response.headers['Last-Modified'] = datetime.now()
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
