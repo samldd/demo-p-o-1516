@@ -2,6 +2,7 @@ import subprocess
 import sys
 import traceback
 import math
+from PID import PID
 from time import gmtime, strftime, sleep
 import robo_car
 import line_follower
@@ -19,6 +20,10 @@ if sys.platform != 'win32':
 
 lastDirectionForward = True
 drive_manual = True
+last_pid_in = None
+last_pid_out = None
+last_motor_left = None
+last_motor_right = None
 
 def debug(f):            # debug decorator takes function f as parameter
     msg = f.__name__     # debug message to print later
@@ -124,7 +129,7 @@ def kill():
 commandQueue = []
 
 def get_debug_info():
-    global left_motor, right_motor, commandQueue
+    global left_motor, right_motor, commandQueue, last_pid_out, last_pid_in, last_motor_left, last_motor_right
     if sys.platform == 'win32':
         return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
     try:
@@ -134,6 +139,8 @@ def get_debug_info():
         style100 = "style=\"width:100" + "%" + "\""
         debuginfo = "<table  " + style100 + "><tr><td>motor left encoder: %s</td><td style=\"text-align: right\">time: %s</td></tr>" % (C, strftime("%H:%M:%S", gmtime()))
         debuginfo += "<tr><td colspan=\"2\">motor right encoder: %s</td></tr></table>" % B
+        debuginfo += "<p>Last PID in: "+str(last_pid_in) +"<br>Last PID out: " + str(last_pid_out) + "</p>"
+        debuginfo += "<p>Last left speed: "+str(last_motor_left) +"<br>Last right speed: " + str(last_motor_right) + "</p>"
 
         if commandQueue:
             debuginfo += "<p>command queue: " + commandQueue[0]
@@ -157,12 +164,50 @@ def getNextCommand():
     commandQueue = commandQueue[1:]
     return rv
 
-
+p=PID(3.0,0.4,1.2)
+p.setPoint(0)
+basePower = 55
+extrapower = 100
 def follow_line(x):
-    pass
+    global last_pid_out, last_pid_in, last_motor_left, last_motor_right
+    if not drive_manual:
+        if eval(x)[1] == None:
+            right_motor.set_velocity(0)
+            left_motor.set_velocity(0)
+            last_motor_left = 0
+            last_motor_right = 0
+            last_pid_in = None
+        else:
+            mikpunt = eval(x)[1][0]-320
+            last_pid_in = mikpunt
+            out = p.update(mikpunt)
+            last_pid_out = out
+            print "PID OUT: " + str(out)
+            if out > 50:
+                out = 50
+            if out < -50:
+                out = -50
 
+            frac = float(out+50)/100
+            if frac >= 0.5:
+                lspeed = int(((1-frac)*(extrapower/frac)+basePower))
+                rspeed = extrapower+basePower
+                print "right motor power:" + str(rspeed)
+                print "left motor power:" + str(lspeed)
+                right_motor.set_velocity(rspeed)
+                left_motor.set_velocity(lspeed)
+                last_motor_right = rspeed
+                last_motor_left = lspeed
+            elif frac < 0.5:
+                rspeed = int((frac)*(extrapower/(1-frac)+basePower))
+                lspeed = int(extrapower+basePower)
+                print "right motor power:" + str(rspeed)
+                print "left motor power:" + str(lspeed)
 
-
+                right_motor.set_velocity(rspeed)
+                left_motor.set_velocity(lspeed)
+                last_motor_left = lspeed
+                last_motor_right = rspeed
 
 
 

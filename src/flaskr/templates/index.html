@@ -42,9 +42,6 @@
       }
     };
 
-    //updateimage.js includen voor oude versie stream
-    //updateImage();
-
     if (window.DeviceOrientationEvent) {
 
 		window.addEventListener("deviceorientation", function(event)
@@ -117,6 +114,22 @@
 	    //alert("Sorry, your browser doesn't support Device Orientation");
 	}
 
+	switchStream();
+    function switchStream()
+    {
+        newImage = new Image();
+
+        newImage.onload = function() {
+            document.getElementById("stream").src = "http://127.0.0.1:5000/video_feed";
+            document.getElementById("streamtitle").innerHTML = "Stream - Image processing client active";
+        };
+        newImage.onerror = function() {
+            document.getElementById("stream").src =  "{{ url_for('video_feed') }}";
+            document.getElementById("streamtitle").innerHTML = "Stream - Image processing client down";
+        };
+        newImage.src = "http://127.0.0.1:5000/video_frame.jpg?t=" + new Date().getTime();
+        setTimeout(switchStream, 1000);
+    }
     </script>
 </head>
 
@@ -128,8 +141,8 @@
         <!-- LEFT PART -->
         <div style="float: left; width:50%">
             <div id="upperleftbox" class="box">
-                <h1>Stream</h1>
-                <center><iframe width="100%" height="480" frameborder="0" style="overflow: hidden;" src="{{ url_for('video_feed') }}"></iframe></center>
+                <h1 id="streamtitle">Stream</h1>
+                <center><iframe id="stream" width="100%" height="480" frameborder="0" style="overflow: hidden;" src="{{ url_for('video_feed') }}"></iframe></center>
             </div>
         </div>
 

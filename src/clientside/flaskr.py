@@ -10,7 +10,7 @@ app = Flask(__name__)
 fetcher = FileFetcher()
 fetcher.initialize()
 
-def gen(filefetcher, oneFrame = False):
+def gen(filefetcher):
     while True:
         frame = str(filefetcher.get_frame())
         yield (b'--frame\r\n'
@@ -19,12 +19,17 @@ def gen(filefetcher, oneFrame = False):
 
 @app.route('/video_feed')
 def video_feed():
-    response = Response(gen(),mimetype='multipart/x-mixed-replace; boundary=frame')
+    response = Response(gen(fetcher),mimetype='multipart/x-mixed-replace; boundary=frame')
     response.headers['Last-Modified'] = datetime.now()
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
     response.headers['Pragma'] = 'no-cache'
     response.headers['Expires'] = '-1'
     return response
+
+@app.route('/video_frame.jpg')
+def get_video_frame():
+    frame = fetcher.get_frame()
+    return Response(frame, mimetype='image/jpeg')
 
 @app.route('/')
 def index():
@@ -36,4 +41,4 @@ def hello_world():
     return "hello world"
 
 if __name__ == '__main__':
-    app.run(debug=False,threaded=True)
+    app.run(debug=True,threaded=True)

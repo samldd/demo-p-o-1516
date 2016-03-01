@@ -99,6 +99,6 @@ def show_index():
 
 if __name__ == '__main__':
     if sys.platform == 'win32':
-        app.run(debug=False,threaded=True)
+        app.run(debug=True,threaded=True)
     else:
         app.run(host='0.0.0.0', debug=False,threaded=True)
