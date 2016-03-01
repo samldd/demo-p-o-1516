@@ -52,33 +52,6 @@
 			var rotation = Math.round(event.alpha);
             document.getElementById("accelerometer").innerHTML = "accelerometer data: xValue: " + xValue + "; yValue: " + yValue + "; rotation: " + rotation;
 
-            var includeY = false;
-            var includeX = false;
-            //yValue tussen 0 en +/-10 is dead zone maar wordt serverside wel verwerkt.
-            if(yValue < 0 && yValue > -80){
-                //steering left
-                includeY = true;
-            }
-            else if(yValue > 0 && yValue < 80){
-                //steering right
-                includeY = true;
-            }
-
-            if(xValue < 0 && xValue > -80){
-                //steering forward
-                includeX = true;
-            }
-            else if(xValue > 0 && xValue < 80){
-                //steering backward
-                includeX = true;
-            }
-            if(includeX || includeY){
-                var site = '/acc?xValue='+xValue+'&yValue='+yValue;
-                someimg = new Image();
-                someimg.src = site;
-            }
-
-
             var c = document.getElementById("a_graph");
             var ctx = c.getContext("2d");
 
@@ -177,13 +150,9 @@
                         </table>
                         <br>
 
-
-                        <!--
-                        <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
-                        <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
-                        -->
                     </td>
                     <td style="text-align: right">
+                        <p>Visit <a href="/accelerometer">/accelerometer</a> for accelerometer driving.</p>
                         <p id="accelerometer"></p>
                         <canvas id="a_graph" width="200" height="200">
                             This text is displayed if your browser does not support HTML5 Canvas.

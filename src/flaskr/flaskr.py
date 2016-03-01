@@ -1,12 +1,12 @@
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash, jsonify, Response
-#import socket_client
 import interface, sys, traceback
-import photo_recognition
 import time
 
-##voor stream
-from camera import Camera
+if sys.platform != 'win32':
+    ##voor stream
+    from camera import Camera
+    cam = Camera()
 
 app = Flask(__name__)
 
@@ -40,7 +40,6 @@ def gen(camera, oneFrame = False):
 def hello_world():
     return "hello world"
 
-cam = Camera()
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(cam),mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -50,6 +49,22 @@ def get_video_frame():
     frame = cam.get_frame()
     return Response(frame, mimetype='image/jpeg')
 
+
+@app.route('/accelerometer')
+def show_accelerometer_page():
+    if request.method == 'POST':
+        if request.form['submit'] == 'forward':
+            interface.forward()
+        elif request.form['submit'] == 'backward':
+            interface.backward()
+        elif request.form['submit'] == 'left':
+            interface.left()
+        elif request.form['submit'] == 'right':
+            interface.right()
+        elif request.form['submit'] == 'stopdriving':
+            interface.forward(0)
+
+    return render_template('accelerometer.html')
 
 @app.route('/', methods=['POST', 'GET'])
 def show_index():

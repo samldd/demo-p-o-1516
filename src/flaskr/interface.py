@@ -4,10 +4,10 @@ import traceback
 import math
 from PID import PID
 from time import gmtime, strftime, sleep
-import robo_car
-import line_follower
 
 if sys.platform != 'win32':
+    import robo_car
+    import line_follower
     from BrickPi import *
     import value_updater
 
@@ -101,6 +101,16 @@ def drive_accelerometer(xValue, yValue):
             right_motor.set_velocity(0)
             return #dead zone
 
+
+        if 120 > xValue > 80:
+            xValue = 80
+        if -120 < xValue < -80:
+            xValue = -80
+        if 80 < yValue < 100:
+            yValue = 80
+        if -100 < yValue < -80:
+            yValue = -80
+
         basePower = 55
         totalpower = float(abs(xValue)-10)/80*(255-basePower)
 
@@ -140,7 +150,7 @@ def get_debug_info():
         debuginfo = "<table  " + style100 + "><tr><td>motor left encoder: %s</td><td style=\"text-align: right\">time: %s</td></tr>" % (C, strftime("%H:%M:%S", gmtime()))
         debuginfo += "<tr><td colspan=\"2\">motor right encoder: %s</td></tr></table>" % B
         debuginfo += "<p>Last PID in: "+str(last_pid_in) +"<br>Last PID out: " + str(last_pid_out) + "</p>"
-        debuginfo += "<p>Last left speed: "+str(last_motor_left) +"<br>Last right speed: " + str(last_motor_right) + "</p>"
+        debuginfo += "<p>Last lefd t speed: "+str(last_motor_left) +"<br>Last right speed: " + str(last_motor_right) + "</p>"
 
         if commandQueue:
             debuginfo += "<p>command queue: " + commandQueue[0]
