@@ -28,7 +28,7 @@ def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
 
 @app.route('/show_action_queue')
-def show_pi_information():
+def show_command_queue():
     return render_template('showactionqueue.html', command_queue=interface.commandQueue)
 
 
@@ -67,7 +67,7 @@ def receive_manual_commands():
     elif command == 'right':
         interface.right()
     elif command == 'stopdriving':
-        interface.forward(0)
+        interface.brake()
     return "send manual driving instructions via get here"
 
 @app.route('/accelerometer', methods=['POST', 'GET'])
@@ -82,7 +82,7 @@ def show_accelerometer_page():
         elif request.form['submit'] == 'right':
             interface.right()
         elif request.form['submit'] == 'stopdriving':
-            interface.forward(0)
+            interface.brake()
         return "should be invisible"
     else:
         return render_template('accelerometer.html')
@@ -118,7 +118,7 @@ def show_index():
             elif request.form['submit'] == 'manual':
                 interface.manual()
             elif request.form['submit'] == 'stopdriving':
-                interface.forward(0)
+                interface.brake()
             elif request.form['submit'] == 'nextleft':
                 interface.addCommand("left")
             elif request.form['submit'] == 'nextforward':

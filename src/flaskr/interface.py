@@ -33,11 +33,14 @@ def debug(f):            # debug decorator takes function f as parameter
         return f(*args)  # call to original function
     return wrapper       # return the wrapper function, without calling it
 
+def brake():
+    setMotorSpeeds(0, 0)
+
 def forward(motorvalue=200):
     global lastDirectionForward, left_motor, right_motor, drive_manual, is_driving
     if drive_manual:
         if not lastDirectionForward and is_driving:
-            forward(0)
+            brake()
         else:
             setMotorSpeeds(motorvalue, motorvalue)
             lastDirectionForward = True
