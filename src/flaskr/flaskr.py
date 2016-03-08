@@ -23,6 +23,12 @@ def receive_line_following_info():
     interface.follow_line(x)
     return "send your line data here"
 
+@app.route('/bat')
+def receive_bat_data():
+    x = int(request.args.get('x'))
+    interface.set_power_factor(x)
+    return "send your power factor data here"
+
 @app.route('/info')
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())

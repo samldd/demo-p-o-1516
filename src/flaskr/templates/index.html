@@ -111,6 +111,12 @@
         newImage.src = "http://127.0.0.1:5000/video_frame.jpg?t=" + new Date().getTime();
         setTimeout(switchStream, 1000);
     }
+    function setBattery() {
+        var x = document.getElementById("powerFactorRange").value;
+        var site = '/bat?x='+x;
+        someimg = new Image();
+        someimg.src = site;
+    }
     </script>
 </head>
 
@@ -174,6 +180,8 @@
                 <p style="margin-top:10px; margin-bottom:0px">INFO: This command stops all python processes on the robot (including webserver hosting this page). Use <i>sudo python ~/robot/flaskr/flaskr.py</i> to restart.</p>
                 <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
                 <br>
+                <p>Set power factor</p>
+                <input type="range" step="0.25" min="0.5" max="2.5" id="powerFactorRange" value="1"><button onclick="setBattery()">Set</button>
 
             </div>
         </div>

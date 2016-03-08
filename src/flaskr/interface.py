@@ -180,3 +180,5 @@ def follow_line(x):
         logger.add_log("cameraInfo: " + str(np.array(eval(x))))
     rob.follow_the_line(x)
 
+def set_power_factor(x):
+    pass
