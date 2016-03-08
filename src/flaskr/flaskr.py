@@ -27,6 +27,11 @@ def receive_line_following_info():
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
 
+@app.route('/show_action_queue')
+def show_pi_information():
+    return render_template('showactionqueue.html', command_queue=interface.commandQueue)
+
+
 
 def gen(camera, oneFrame = False):
     while True:

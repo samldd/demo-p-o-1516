@@ -90,31 +90,28 @@
 </head>
 
 <body>
-<div class ="box" style="padding: 5px;"><h1>P&amp;O demo 2015-2016</h1></div>
-<div class="box">
-    <h1>Manual controls</h1>
-    <a class="btn" href="javascript:drive_accelerometer_button();"><i id="endis" class="icon-flag-checkered"> enable accelerometer</i></a>
-    <table>
-        <tr>
-            <td></td>
-            <td><a class="btn" href="javascript:sendCommand('forward');"><i class="icon-arrow-circle-up"></i></a></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td><a class="btn" href="javascript:sendCommand('left');"><i class="icon-arrow-circle-left"></i></a></td>
-            <td><a class="btn" href="javascript:sendCommand('backward');"><i class="icon-arrow-circle-down"></i></a></td>
-            <td><a class="btn" href="javascript:sendCommand('right');"><i class="icon-arrow-circle-right"></i></a></td>
-        </tr>
-        <tr><td colspan="3"><a class="btn" href="javascript:sendCommand('stopdriving');"><i class="icon-flag-checkered"></i> brake</a></td></tr>
-    </table>
-    <br>
+<h1>P&amp;O demo 2015-2016</h1>
+<h2>Manual controls</h2>
+<a class="btn" href="javascript:drive_accelerometer_button();"><i id="endis" class="icon-flag-checkered"> enable accelerometer</i></a>
+<table>
+    <tr>
+        <td></td>
+        <td><a class="btn" href="javascript:sendCommand('forward');"><i class="icon-arrow-circle-up"></i></a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><a class="btn" href="javascript:sendCommand('left');"><i class="icon-arrow-circle-left"></i></a></td>
+        <td><a class="btn" href="javascript:sendCommand('backward');"><i class="icon-arrow-circle-down"></i></a></td>
+        <td><a class="btn" href="javascript:sendCommand('right');"><i class="icon-arrow-circle-right"></i></a></td>
+    </tr>
+    <tr><td colspan="3"><a class="btn" href="javascript:sendCommand('stopdriving');"><i class="icon-flag-checkered"></i> brake</a></td></tr>
+</table>
+<br>
 
-    <p id="accelerometer"></p>
-    <canvas id="a_graph" width="200" height="200">
-        This text is displayed if your browser does not support HTML5 Canvas.
-    </canvas>
-    </div>
-</div>
+<p id="accelerometer"></p>
+<canvas id="a_graph" width="200" height="200">
+    This text is displayed if your browser does not support HTML5 Canvas.
+</canvas>
 
 </body>
 
