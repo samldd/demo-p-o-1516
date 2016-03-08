@@ -1,14 +1,14 @@
 import time
 import math
 import driving
-import follow_controller
+import follow_controller2
 
 
 class RoboCar(object):
     def __init__(self):
         self.driving = driving.Driving()
         self.driving.start()
-        self.lineController = follow_controller.Follower(self.driving,self)
+        self.lineController = follow_controller2.Follower(self.driving,self)
         self.lineController.start()
         self.lineInfo = None
     
@@ -60,7 +60,13 @@ class RoboCar(object):
         self.driving.stop_driving()
 
     def follow_the_line(self,factor):
-        self.lineController.set_camera_info(factor)
+        return self.lineController.set_camera_info(factor)
+
+    def activate_automatic_driving(self):
+        self.lineController.resume()
+
+    def deactivate_automatic_driving(self):
+        self.lineController.pauze()
 
     def halt(self):
         self.driving.stop_driving()

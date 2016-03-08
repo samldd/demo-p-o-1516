@@ -1,11 +1,15 @@
 from BrickPi import *
 import time
+from logger import Logger
 
 class Motor(object):
+
+
     def __init__(self, port):
         BrickPiSetup()
         self.velocity = 0
         self.port = port
+        self.logger = Logger("motor_%s" %port)
         self.enable_motor()
         self.encoder_reference = BrickPi.Encoder[port]
 
@@ -41,7 +45,7 @@ class Motor(object):
         self.set_velocity(0)
 
     def port_switch(self):
-        print "!!!!!!!!!!  PORT SWITCH : PORT %s !!!!!!!!!!!!!" %self.port
+        self.logger.add_log("WARNING: PORT SWITCH!")
         if self.port == 0:
             self.port = 2
         elif self.port == 1:
@@ -50,5 +54,7 @@ class Motor(object):
             self.port = 0
         elif self.port == 3:
             self.port = 1
-        print "NEW PORT: %s" %self.port
 
+
+left = Motor(PORT_B)
+right = Motor(PORT_C)
