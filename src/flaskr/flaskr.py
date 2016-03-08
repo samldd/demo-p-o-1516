@@ -125,6 +125,8 @@ def show_index():
                 interface.addCommand("forward")
             elif request.form['submit'] == 'nextright':
                 interface.addCommand("right")
+            elif request.form['submit'] == 'undocommand':
+                interface.removeCommand()
             else:
                 return render_template('debug_sentence.html', sentence='unknown command received')
         except:
