@@ -148,20 +148,11 @@ logger = Logger("interface")
 
 
 def get_debug_info():
-    global left_motor, right_motor, commandQueue, last_pid_out, last_pid_in, last_motor_left, last_motor_right
+    global logger
     if sys.platform == 'win32':
         return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
     try:
         debuginfo = logger.get_log()
-
-        if commandQueue:
-            # debuginfo += "<p>command queue: " + commandQueue[0]
-
-            for command in commandQueue[1:]:
-                debuginfo+= " -> " + command
-            debuginfo += "</p>"
-        else:
-            debuginfo += "command queue is empty, click \"next crossroad X\" to give directions to the robot."
         return debuginfo
     except:
         return traceback.format_exc().replace('\n', '<br />')
@@ -175,6 +166,10 @@ def getNextCommand():
     rv = commandQueue[0]
     commandQueue = commandQueue[1:]
     return rv
+
+def removeCommand():
+    global commandQueue
+    commandQueue = commandQueue[:-1]
 
 import numpy as np
 
