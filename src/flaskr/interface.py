@@ -19,6 +19,7 @@ if sys.platform != 'win32':
     left_motor = Motor(PORT_C)
 
 lastDirectionForward = True
+is_driving = False
 drive_manual = True
 last_pid_in = None
 last_pid_out = None
@@ -33,22 +34,26 @@ def debug(f):            # debug decorator takes function f as parameter
     return wrapper       # return the wrapper function, without calling it
 
 def forward(motorvalue=200):
-    global lastDirectionForward, left_motor, right_motor, drive_manual
+    global lastDirectionForward, left_motor, right_motor, drive_manual, is_driving
     if drive_manual:
-        left_motor.set_velocity(motorvalue)    #Set the speed of MotorA (-255 to 255)
-        right_motor.set_velocity(motorvalue)
-        lastDirectionForward = True
+        if not lastDirectionForward and is_driving:
+            forward(0)
+        else:
+            setMotorSpeeds(motorvalue, motorvalue)
+            lastDirectionForward = True
 
 def manual():
     global drive_manual
     drive_manual = True
 
 def backward(motorvalue=-200):
-    global lastDirectionForward, left_motor, right_motor, drive_manual
+    global lastDirectionForward, left_motor, right_motor, drive_manual, is_driving
     if drive_manual:
-        left_motor.set_velocity(motorvalue)
-        right_motor.set_velocity(motorvalue)
-        lastDirectionForward = False
+        if is_driving and lastDirectionForward:
+            forward(0)
+        else:
+            setMotorSpeeds(motorvalue, motorvalue)
+            lastDirectionForward = False
 
 def sharpleft():
     global left_motor, right_motor, drive_manual
@@ -56,11 +61,9 @@ def sharpleft():
         startval = left_motor.get_encoder_value()
         while abs(left_motor.get_encoder_value() - startval) < 1000:
             if lastDirectionForward:
-                left_motor.set_velocity(-200)    #Set the speed of MotorA (-255 to 255)
-                right_motor.set_velocity(200)
+                setMotorSpeeds(-200,200)
             else:
-                left_motor.set_velocity(200)    #Set the speed of MotorA (-255 to 255)
-                right_motor.set_velocity(-200)
+                setMotorSpeeds(200, -200)
 
 def sharpright():
     global left_motor, right_motor, drive_manual
@@ -68,26 +71,31 @@ def sharpright():
         startval = left_motor.get_encoder_value()
         while abs(left_motor.get_encoder_value() - startval) < 1000:
             if lastDirectionForward:
-                left_motor.set_velocity(200)    #Set the speed of MotorA (-255 to 255)
-                right_motor.set_velocity(-200)
+                setMotorSpeeds(200,-200)
             else:
-                left_motor.set_velocity(-200)    #Set the speed of MotorA (-255 to 255)
-                right_motor.set_velocity(200)
+                setMotorSpeeds(-200,200)
 
 def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
     global left_motor, right_motor, drive_manual
     if drive_manual:
         if lastDirectionForward:
-            left_motor.set_velocity(leftMotorAbsSpeed)
-            right_motor.set_velocity(rightMotorAbsSpeed)
+            setMotorSpeeds(leftMotorAbsSpeed, rightMotorAbsSpeed)
         else:
-            left_motor.set_velocity(-leftMotorAbsSpeed)
-            right_motor.set_velocity(-rightMotorAbsSpeed)
+            setMotorSpeeds(-leftMotorAbsSpeed, -rightMotorAbsSpeed)
 
 def right():
     global drive_manual
     if drive_manual:
         left(250,100)
+
+def setMotorSpeeds(left, right):
+    global left_motor, right_motor, is_driving
+    if left == 0 and right == 0:
+        is_driving = False
+    else:
+        is_driving = True
+    left_motor.set_velocity(left)    #Set the speed of MotorA (-255 to 255)
+    right_motor.set_velocity(right)
 
 def drive_auto():
     global drive_manual
