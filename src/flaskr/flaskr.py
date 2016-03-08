@@ -50,7 +50,22 @@ def get_video_frame():
     return Response(frame, mimetype='image/jpeg')
 
 
-@app.route('/accelerometer')
+@app.route('/man')
+def receive_manual_commands():
+    command = request.args.get('command')
+    if command == 'forward':
+        interface.forward()
+    elif command == 'backward':
+        interface.backward()
+    elif command == 'left':
+        interface.left()
+    elif command == 'right':
+        interface.right()
+    elif command == 'stopdriving':
+        interface.forward(0)
+    return "send manual driving instructions via get here"
+
+@app.route('/accelerometer', methods=['POST', 'GET'])
 def show_accelerometer_page():
     if request.method == 'POST':
         if request.form['submit'] == 'forward':
@@ -63,8 +78,9 @@ def show_accelerometer_page():
             interface.right()
         elif request.form['submit'] == 'stopdriving':
             interface.forward(0)
-
-    return render_template('accelerometer.html')
+        return "should be invisible"
+    else:
+        return render_template('accelerometer.html')
 
 @app.route('/', methods=['POST', 'GET'])
 def show_index():

@@ -23,24 +23,33 @@
         }
         else{
             document.getElementById('endis').innerHTML = ' enable accelerometer';
+            sendCommand('stopdriving');
         }
     }
 
+    function sendCommand(com){
+        if(!drive_accelerometer){
+            //send accelerometer data
+            var site = '/man?command='+com;
+            someimg = new Image();
+            someimg.src = site;
+        }
+    }
 
     if (window.DeviceOrientationEvent) {
 		window.addEventListener("deviceorientation", function(event)
 		{
-
 			var xValue = Math.round(event.gamma);
 			var yValue = Math.round(event.beta);
 			var rotation = Math.round(event.alpha);
             document.getElementById("accelerometer").innerHTML = "accelerometer data: xValue: " + xValue + "; yValue: " + yValue + "; rotation: " + rotation;
 
-            //send accelerometer data
-            var site = '/acc?xValue='+xValue+'&yValue='+yValue;
-            someimg = new Image();
-            someimg.src = site;
-
+            if(drive_accelerometer){
+                //send accelerometer data
+                var site = '/acc?xValue='+xValue+'&yValue='+yValue;
+                someimg = new Image();
+                someimg.src = site;
+            }
 
             var c = document.getElementById("a_graph");
             var ctx = c.getContext("2d");
@@ -81,54 +90,32 @@
 </head>
 
 <body>
-<div class ="wrapper">
-    <div class ="box" style="padding: 5px;"><h1>P&amp;O demo 2015-2016</h1></div>
-        <div id="upperrightbox" class="box">
-            <h1>Manual controls</h1>
-            <a class="btn" href="javascript:drive_accelerometer_button();"><i id="endis" class="icon-flag-checkered"> enable accelerometer</i></a>
-            <table width="100%">
-                <tr width="100%"><td>
-                    <table>
-                        <tr>
-                            <td></td>
-                            <td><a class="btn" href="javascript:document.querySelector('input[value=forward]').click();"><i class="icon-arrow-circle-up"></i></a></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td><a class="btn" href="javascript:document.querySelector('input[value=left]').click();"><i class="icon-arrow-circle-left"></i></a></td>
-                            <td><a class="btn" href="javascript:document.querySelector('input[value=backward]').click();"><i class="icon-arrow-circle-down"></i></a></td>
-                            <td><a class="btn" href="javascript:document.querySelector('input[value=right]').click();"><i class="icon-arrow-circle-right"></i></a></td>
-                        </tr>
-                        <tr><td colspan="3"><a class="btn" href="javascript:document.querySelector('input[value=stopdriving]').click();"><i class="icon-flag-checkered"></i> brake</a></td></tr>
-                    </table>
-                    <br>
+<div class ="box" style="padding: 5px;"><h1>P&amp;O demo 2015-2016</h1></div>
+<div class="box">
+    <h1>Manual controls</h1>
+    <a class="btn" href="javascript:drive_accelerometer_button();"><i id="endis" class="icon-flag-checkered"> enable accelerometer</i></a>
+    <table>
+        <tr>
+            <td></td>
+            <td><a class="btn" href="javascript:sendCommand('forward');"><i class="icon-arrow-circle-up"></i></a></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><a class="btn" href="javascript:sendCommand('left');"><i class="icon-arrow-circle-left"></i></a></td>
+            <td><a class="btn" href="javascript:sendCommand('backward');"><i class="icon-arrow-circle-down"></i></a></td>
+            <td><a class="btn" href="javascript:sendCommand('right');"><i class="icon-arrow-circle-right"></i></a></td>
+        </tr>
+        <tr><td colspan="3"><a class="btn" href="javascript:sendCommand('stopdriving');"><i class="icon-flag-checkered"></i> brake</a></td></tr>
+    </table>
+    <br>
 
-
-                    <!--
-                    <a class="btn" href="javascript:document.querySelector('input[value=picture]').click();"><i class="icon-camera"></i> Take picture</a>
-                    <a class="btn" href="javascript:document.querySelector('input[value=stream]').click();"><i class="icon-video-camera"></i> stream</a>
-                    -->
-                </td>
-                <td style="text-align: right">
-                    <p id="accelerometer"></p>
-                    <canvas id="a_graph" width="200" height="200">
-                        This text is displayed if your browser does not support HTML5 Canvas.
-                    </canvas>
-                </td></tr>
-            </table>
-        </div>
+    <p id="accelerometer"></p>
+    <canvas id="a_graph" width="200" height="200">
+        This text is displayed if your browser does not support HTML5 Canvas.
+    </canvas>
     </div>
 </div>
 
-
-<form method="post" target="response_iframe">
-    <input type="submit" name="submit" value="left" style="display:none">
-    <input type="submit" name="submit" value="backward" style="display:none">
-    <input type="submit" name="submit" value="right" style="display:none">
-    <input type="submit" name="submit" value="forward" style="display:none">
-
-    <input type="submit" name="submit" value="stopdriving" style="display:none">
-</form>
 </body>
 
 </html>

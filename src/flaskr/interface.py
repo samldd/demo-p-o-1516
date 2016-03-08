@@ -95,21 +95,15 @@ def drive_auto():
 
 def drive_accelerometer(xValue, yValue):
     global left_motor, right_motor
+    #hier xValue tussen -90 en 90
+    #-90 = hard vooruit
+    # ]-10, 10[ is stil staan
+    # 90 = hard achteruit
     if drive_manual:
         if -10 < yValue < 10 and -10 < xValue < 10:
             left_motor.set_velocity(0)
             right_motor.set_velocity(0)
             return #dead zone
-
-
-        if 120 > xValue > 80:
-            xValue = 80
-        if -120 < xValue < -80:
-            xValue = -80
-        if 80 < yValue < 100:
-            yValue = 80
-        if -100 < yValue < -80:
-            yValue = -80
 
         basePower = 55
         totalpower = float(abs(xValue)-10)/80*(255-basePower)
