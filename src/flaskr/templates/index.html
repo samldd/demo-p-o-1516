@@ -117,6 +117,9 @@
         someimg = new Image();
         someimg.src = site;
     }
+    function updateTextInput(val) {
+        document.getElementById('textInput').value=val;
+    }
     </script>
 </head>
 
@@ -181,7 +184,7 @@
                 <a class="btn" href="javascript:document.querySelector('input[value=kill]').click();"><i class="icon-heartbeat"></i> Kill python</a>
                 <br>
                 <p>Set power factor</p>
-                <input type="range" step="0.25" min="0.5" max="2.5" id="powerFactorRange" value="1"><button onclick="setBattery()">Set</button>
+                <input type="range" step="0.25" min="0.5" max="2.5" onchange="updateTextInput(this.value);" id="powerFactorRange" value="1"><input type="text" style="width: 2em; border: 0px solid white" disabled="true" id="textInput" value="1"><button onclick="setBattery()">Set</button>
 
             </div>
         </div>

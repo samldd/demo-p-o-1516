@@ -3,10 +3,13 @@ from flask import Flask, request, session, g, redirect, url_for, \
 import interface, sys, traceback
 import time
 
-if sys.platform != 'win32':
+cam = None
+try:
     ##voor stream
     from camera import Camera
     cam = Camera()
+except:
+    pass
 
 app = Flask(__name__)
 
@@ -25,7 +28,7 @@ def receive_line_following_info():
 
 @app.route('/bat')
 def receive_bat_data():
-    x = int(request.args.get('x'))
+    x = float(request.args.get('x'))
     interface.set_power_factor(x)
     return "send your power factor data here"
 
@@ -40,12 +43,13 @@ def show_command_queue():
 
 
 def gen(camera, oneFrame = False):
-    while True:
-        frame = camera.get_frame()
-        #frame = photo_recognition.detect_lines(a)
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        time.sleep(0.15)
+    if cam:
+        while True:
+            frame = camera.get_frame()
+            #frame = photo_recognition.detect_lines(a)
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            time.sleep(0.15)
 
 @app.route('/hello_world')
 def hello_world():
@@ -57,8 +61,11 @@ def video_feed():
 
 @app.route('/video_frame.jpg')
 def get_video_frame():
-    frame = cam.get_frame()
-    return Response(frame, mimetype='image/jpeg')
+    if cam:
+        frame = cam.get_frame()
+        return Response(frame, mimetype='image/jpeg')
+    else:
+        return "picamera package not installed"
 
 
 @app.route('/man')
