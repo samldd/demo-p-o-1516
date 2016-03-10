@@ -38,7 +38,7 @@ def show_pi_information():
 
 @app.route('/show_action_queue')
 def show_command_queue():
-    return render_template('showactionqueue.html', command_queue=interface.commandQueue)
+    return render_template('showactionqueue.html', command_queue=interface.getCommandQueue())
 
 
 

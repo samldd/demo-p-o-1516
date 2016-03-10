@@ -17,10 +17,11 @@ if sys.platform != 'win32':
 
     vu = value_updater.ValueUpdater()
     vu.start()
+    rob = robo_car.RoboCar()
 
     import motor
-    right_motor = motor.left
-    left_motor = motor.right
+    right_motor = motor.Motor.left
+    left_motor = motor.Motor.right
 
 lastDirectionForward = True
 is_driving = False
@@ -140,36 +141,32 @@ def kill():
     else:
         subprocess.call(["sudo", "killall", "python", "-9"])
 
-
-commandQueue = []
-
 from logger import Logger
 logger = Logger("interface")
 
-
+debuginfo = ""
 def get_debug_info():
-    global logger
+    global logger,debuginfo
     if sys.platform == 'win32':
         return "it is now: %s"%strftime("%d/%m/%Y %H:%M:%S", gmtime())
     try:
-        debuginfo = logger.get_log()
+        debuginfo = logger.get_log() + debuginfo
         return debuginfo
     except:
         return traceback.format_exc().replace('\n', '<br />')
 
-def addCommand(command):
-    global commandQueue
-    commandQueue.append(command)
 
-def getNextCommand():
-    global commandQueue
-    rv = commandQueue[0]
-    commandQueue = commandQueue[1:]
-    return rv
+def addCommand(command):
+    global rob
+    rob.add_instruction(command)
+
+def getCommandQueue():
+    global rob
+    return rob.get_commands()
 
 def removeCommand():
-    global commandQueue
-    commandQueue = commandQueue[:-1]
+    global rob
+    rob.remove_instruction()
 
 import numpy as np
 
@@ -180,5 +177,8 @@ def follow_line(x):
         logger.add_log("cameraInfo: " + str(np.array(eval(x))))
     rob.follow_the_line(x)
 
+import driving
 def set_power_factor(x):
-    pass
+    print "try to set battery factor"
+    driving.Driving.battery_factor = x
+    print driving.Driving.battery_factor

@@ -1,107 +1,100 @@
-import math
-import time
-import numpy as np
 import threading
+import numpy as np
+
+import time
+from logger import Logger
+
+import straight_controller
+import left_controller
+import right_controller
 
 
 class Follower(threading.Thread):
 
     def __init__(self,driving,rob):
         threading.Thread.__init__(self)
-        self.driving = driving
-        self.rob = rob
-        self.running = True
-        self.pauzed = False
-        self.instructions = ["straight"]
 
+        self.running = True
+        self.active = False
+        self.logger = Logger("LineFollowing")
+
+        self.instructions = []
+        self.latest_action = ""
         self.last_update = 0
-        self.cameraInfo1 = [None,None,None,None]
-        self.cameraInfo2 = [None,None,None,None]
+        self.cameraInfo = [None,None,None,None]
+
+        self.driving = driving
+
+        self.straightController = straight_controller.Straight(driving,rob)
+        self.leftController = left_controller.Left(driving,rob,self.straightController)
+        self.rightController = right_controller.Right(driving,rob,self.straightController)
+
+    def get_instructions(self):
+        return self.instructions
 
     def add_instruction(self,instruction):
-        if not(instruction in ["left","straight","right"]):
+        if not(instruction in ["left","forward","right"]):
             raise Exception
-        self.instruction.append(instruction)
+        self.logger.add_log("instruction added: " + instruction)
+        self.instructions.append(instruction)
+
+    def remove_instruction(self):
+        self.logger.add_log("instruction removed: " + self.instructions[-1])
+        self.instructions = self.instructions[:-1]
 
     def set_camera_info(self,cameraInfo):
-        with open('debug.txt' ,"a") as tf:
-            tf.write(str(self.last_update-time.time()) + " " + str(cameraInfo) + "\n")
-        self.cameraInfo2 = self.cameraInfo1
-        self.cameraInfo1 = np.array(eval(cameraInfo))
+        self.cameraInfo = np.array(eval(cameraInfo))
+        self.straightController.set_camera_info(self.cameraInfo)
+        self.leftController.set_camera_info(self.cameraInfo)
+        self.rightController.set_camera_info(self.cameraInfo)
         self.last_update = time.time()
+        return self.latest_action
 
     def run(self):
         while self.running:
-            if len(self.instructions) == 0:
-                self.driving.stop_driving()
-                time.sleep(0.30)
-            if time.time() - self.last_update < 0.25:
-                self.control()
-                time.sleep(0.05)
+            if self.active:
+                if len(self.instructions) == 0:
+                    self.logger.add_log("awaiting instructions...")
+                    self.driving.stop_driving()
+                    time.sleep(1)
+                elif time.time() - self.last_update < 0.25:
+                    self.control()
+                    time.sleep(0.10)
+                else:
+                    print "no camera image in time"
+                    self.driving.stop_driving()
+                    time.sleep(0.10)
             else:
-                self.driving.stop_driving()
-                time.sleep(0.20)
+                time.sleep(1)
 
     def control(self):
-        [left,_,right,up] = self.cameraInfo1
-        if self.instructions[0] == "straight":
-            self.follow_road()
-        if self.instructions[0] == "left":
-            if self.check_side(True) and up:
-                self.turn(True,left)
-            else:
-                self.follow_road()
         if self.instructions[0] == "right":
-            if self.check_side(False) and up:
-                self.turn(False,right)
-            else:
-                self.follow_road()
+            if self.rightController.check_crossing():
+                self.instructions = self.instructions[:-1]
 
-    def follow_road(self):
-        [left,down,right,up] = self.cameraInfo1
-        if down and up:
-            self.straight(down)
-        elif up:
-            self.straight((0,(320-up[0])/5))
-        elif self.check_side(True) and not self.check_up():
-            self.turn(True,left)
-        elif self.check_side(False) and not self.check_up():
-            self.turn(False,right)
+        elif self.instructions[0] == "left":
+            if self.leftController.check_crossing():
+                self.instructions = self.instructions[:-1]
         else:
-            self.driving.stop_driving()
+            if self.straightController.check_crossing():
+                self.instructions = self.instructions[:-1]
 
-    def check_side(self,left):
-        if left:
-            return self.cameraInfo2[0] and self.cameraInfo1[0]
-        else:
-            return self.cameraInfo2[2] and self.cameraInfo1[2]
+    def resume(self):
+        self.active = True
 
-    def check_up(self):
-        return self.cameraInfo2[3] or self.cameraInfo1[3]
-
-    def turn(self,left,(mid,angle)):
-        self.pauzed = True
-        self.rob.drive_straight(mid/10000)
-        if left:
-            self.rob.turn(-angle)
-        else:
-            self.rob.turn(angle)
-        self.pauzed = False
-
-    def straight(self,down):
-        (mid,angle) = down
-        if -5 < angle < 5:
-            self.driving.drive_straight()
-            with open('debug.txt' ,"a") as tf:
-                tf.write("straight" + "\n")
-            return
-        rad = 59-0.3*abs(angle)
-        rad = rad if angle > 0 else -rad
-        with open('debug.txt' ,"a") as tf:
-                tf.write("drive arc %s radius" %rad + "\n")
-        self.driving.drive_arc(rad)
+    def pauze(self):
+        self.active = False
 
     def stop(self):
         self.running = False
+
+    def write_debug_info(self,text):
+        self.latest_action = text
+        self.logger.add_log("latest action = " + text)
+        with open('debug.txt' ,"a") as tf:
+                    tf.write(text + "\n")
+
+
+
 
 

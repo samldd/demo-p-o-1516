@@ -2,7 +2,7 @@ from __future__ import division
 import math
 import time
 import threading
-
+from logger import Logger
 import BrickPi
 
 import motor
@@ -19,12 +19,13 @@ class Driving(threading.Thread):
         self.d_wheel = 0.145
         self.perimeter_wheel = 0.055 * math.pi
 
-        self.left_motor = motor.left
-        self.right_motor = motor.right
+        self.left_motor = motor.Motor.left
+        self.right_motor = motor.Motor.right
 
         self.left_speed = 0
         self.right_speed = 0
 
+        self.logger = Logger("driving")
         self.left_ticks = self.left_motor.get_encoder_value()
         self.right_ticks = self.right_motor.get_encoder_value()
 
@@ -59,6 +60,7 @@ class Driving(threading.Thread):
             self.right_speed = self.default_speed/self.factor
 
     def drive_correction(self,correction):
+        self.logger.add_log("correction factor = %s" %correction)
         if abs(correction) < 1:
             self.drive_straight(self.battery_factor*80)
         else:
@@ -66,16 +68,18 @@ class Driving(threading.Thread):
                 self.stop_driving()
             self.direction = "forward"
             self.paused = False
-            self.default_speed = 60*math.pow(abs(correction),1/3) if abs(correction)> 1.75 else 80*math.sqrt(abs(correction))
+
+            correction = (correction-1)/2*100
+
             self.factor = correction
             if correction > 0:
-                self.left_speed = Driving.battery_factor*self.default_speed/correction
-                self.right_speed = Driving.battery_factor*self.default_speed
+                self.left_speed = Driving.battery_factor*(115-correction/2)
+                self.right_speed = Driving.battery_factor*(115+correction/2)
+                self.factor = self.right_speed/self.left_speed
             else:
-                self.left_speed = Driving.battery_factor*self.default_speed
-                self.right_speed = Driving.battery_factor*self.default_speed/abs(correction)
-            self.left_speed *= Driving.battery_factor
-            self.right_speed *= Driving.battery_factor
+                self.left_speed = Driving.battery_factor*(115+correction/2)
+                self.right_speed = Driving.battery_factor*(115-correction/2)
+                self.factor = self.left_speed/self.right_speed
 
     def get_driven_distance(self):
         Ticks360 = 700
@@ -111,22 +115,17 @@ class Driving(threading.Thread):
         self.left_speed = Driving.battery_factor*-50
         self.right_speed = Driving.battery_factor*-50
 
-    def turn(self,degrees):
-        "PID ????"
-        self.stop_driving()
-        self.factor = 0
-        self.direction = "turning"
+    def turn(self,degrees,speed=70):
+        if self.direction != "turning":
+            self.stop_driving()
+            self.factor = 0
+            self.direction = "turning"
+            self.reset()
         wheel_degrees = self.d_wheel * math.pi * degrees/360
-        speed = Driving.battery_factor*80 if wheel_degrees >= 0 else Driving.battery_factor*-80
+        speed = Driving.battery_factor*speed if wheel_degrees >= 0 else Driving.battery_factor*-speed
         self.left_motor.set_velocity(speed)
         self.right_motor.set_velocity(-speed)
-        self.reset()
-        while True:
-            time.sleep(0.05)
-            left,right = self.get_driven_distance()
-            if left > abs(wheel_degrees) or right > abs(wheel_degrees):
-                self.stop_driving()
-                break
+        return wheel_degrees
 
     def reset(self):
         self.left_ticks = self.left_motor.get_encoder_value()

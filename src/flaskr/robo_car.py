@@ -1,14 +1,15 @@
 import time
 import math
 import driving
-import follow_controller2
+import follow_controller
 
 
 class RoboCar(object):
     def __init__(self):
         self.driving = driving.Driving()
         self.driving.start()
-        self.lineController = follow_controller2.Follower(self.driving,self)
+
+        self.lineController = follow_controller.Follower(self.driving,self)
         self.lineController.start()
         self.lineInfo = None
     
@@ -35,9 +36,21 @@ class RoboCar(object):
 
     def turn(self,degree):
         print "turn %d" %degree
-        self.driving.turn(degree)
-        while self.driving.get_status() == "turning":
-            time.sleep(0.1)
+        speed = 70
+        wheel_degrees = self.driving.turn(degree,speed)
+        time.sleep(0.05)
+        pleft,pright = self.driving.get_driven_distance()
+        while True:
+            time.sleep(0.07)
+            left,right = self.driving.get_driven_distance()
+            if left > abs(wheel_degrees) or right > abs(wheel_degrees):
+                break
+            if left-pleft < 15 or right-pright <15:
+                speed += 10
+                self.driving.turn(0,speed)
+            pleft = left
+            pright = right
+        self.driving.stop_driving()
 
     def drive_arc(self,degrees, radius):
         print "drive arc"
@@ -67,6 +80,15 @@ class RoboCar(object):
 
     def deactivate_automatic_driving(self):
         self.lineController.pauze()
+
+    def add_instruction(self,instruction):
+        self.lineController.add_instruction(instruction)
+
+    def remove_instruction(self):
+        self.lineController.remove_instruction()
+
+    def get_commands(self):
+        return self.lineController.get_instructions()
 
     def halt(self):
         self.driving.stop_driving()

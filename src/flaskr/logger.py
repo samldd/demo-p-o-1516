@@ -14,7 +14,7 @@ class Logger:
     def get_log(self):
         string = ""
         for m in Logger.log:
-            string += "<p>"+ str(m) + "</p>"
+            string += str(m) + "<br>"
         self.reset_logger()
         return string
 
