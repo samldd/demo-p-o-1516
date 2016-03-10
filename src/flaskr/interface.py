@@ -19,8 +19,8 @@ if sys.platform != 'win32':
     vu.start()
 
     import motor
-    right_motor = motor.right
-    left_motor = motor.left
+    right_motor = motor.left
+    left_motor = motor.right
 
 lastDirectionForward = True
 is_driving = False
