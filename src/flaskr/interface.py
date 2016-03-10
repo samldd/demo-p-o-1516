@@ -177,8 +177,13 @@ def follow_line(x):
         logger.add_log("cameraInfo: " + str(np.array(eval(x))))
     rob.follow_the_line(x)
 
-import driving
+try: import driving
+except: pass
 def set_power_factor(x):
     print "try to set battery factor"
     driving.Driving.battery_factor = x
     print driving.Driving.battery_factor
+
+def tune_parameter(key, value):
+    print key, value
+    pass
