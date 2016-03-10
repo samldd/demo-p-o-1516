@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="refresh" content="1">
+    <meta http-equiv="refresh" content="-1">
 </head>
 
 <body>
+<p>List of actions in order that they will be done:</p>
+{% if command_queue %}
 <ol>
     {% for command in command_queue %}
         <li>{{ command }}</li>
     {% endfor %}
 </ol>
+{% else %}
+<p style="font-weight: bold">No commands yet. Use the buttons under automatic driving to add commands.</p>
+{% endif %}
 </body>
 </html>

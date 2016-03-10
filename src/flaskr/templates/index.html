@@ -120,6 +120,18 @@
     function updateTextInput(val) {
         document.getElementById('textInput').value=val;
     }
+
+    refresh_action_iframe();
+    function refresh_action_iframe(){
+        var iframe1 = document.getElementById('actionqueueiframe1');
+        var iframe2 = document.getElementById('actionqueueiframe2');
+        if(iframe1 != null && iframe2 != null){
+            iframe2.contentWindow.location.reload();
+            iframe1.contentWindow.document.body.innerHTML = iframe2.contentWindow.document.body.innerHTML;
+        }
+        setTimeout(refresh_action_iframe, 400);
+    }
+
     </script>
 </head>
 
@@ -174,8 +186,8 @@
                 <table>
                     <tr>
                         <td><a class="btn" href="javascript:document.querySelector('input[value=nextleft]').click();"><i class="icon-arrow-circle-left"></i> next crossroad left</a></td>
-                        <td><a class="btn" href="javascript:document.querySelector('input[value=nextforward]').click();"><i class="icon-arrow-circle-up"></i> next crossroad forward</a></td>
                         <td><a class="btn" href="javascript:document.querySelector('input[value=nextright]').click();"><i class="icon-arrow-circle-right"></i> next crossroad right</a></td>
+                        <td><a class="btn" href="javascript:document.querySelector('input[value=nextforward]').click();"><i class="icon-arrow-circle-up"></i> next crossroad forward</a></td>
                         <td><a class="btn" href="javascript:document.querySelector('input[value=undocommand]').click();"><i class="icon-undo"></i> undo last command</a></td>
                     </tr>
                 </table>
@@ -203,7 +215,8 @@
         <div style="float: left; width: 50%">
             <div class="box">
                 <h1>Action queue</h1>
-                <iframe src="/show_action_queue" frameborder="0"  style="overflow:hidden; height: 120px; width: 100%;"></iframe>
+                <iframe id="actionqueueiframe1" src="/show_action_queue" frameborder="0"  style="overflow:hidden; height: 120px; width: 100%;"></iframe>
+                <iframe id="actionqueueiframe2" src="/show_action_queue" frameborder="0"  style="display: none; overflow:hidden; height: 120px; width: 100%;"></iframe>
                 <iframe name="response_iframe" style="height: 70px; width: 600px; display: none" frameBorder="0"></iframe>
             </div>
         </div>
