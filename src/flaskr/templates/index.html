@@ -132,6 +132,17 @@
         setTimeout(refresh_action_iframe, 400);
     }
 
+    refresh_info_iframe();
+    function refresh_info_iframe(){
+        var iframe1 = document.getElementById('infoiframe1');
+        var iframe2 = document.getElementById('infoiframe2');
+        if(iframe1 != null && iframe2 != null){
+            iframe2.contentWindow.location.reload();
+            iframe1.contentWindow.document.body.innerHTML = iframe2.contentWindow.document.body.innerHTML;
+        }
+        setTimeout(refresh_info_iframe, 400);
+    }
+
     </script>
 </head>
 
@@ -207,7 +218,8 @@
             <div class="box">
                 <h1>information</h1>
                 <p>INFO: encoder value represents the amount of half degrees a wheel has turned.</p>
-                <iframe src="/info" frameBorder="0" style="overflow:hidden; height: 120px; width: 100%;"></iframe>
+                <iframe id ="infoiframe1" src="/info" frameBorder="0" style="overflow:hidden; height: 120px; width: 100%;"></iframe>
+                <iframe id ="infoiframe2" src="/info" frameBorder="0" style="display: none; overflow:hidden; height: 120px; width: 100%;"></iframe>
             </div>
         </div>
 
