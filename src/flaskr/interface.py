@@ -57,25 +57,26 @@ def backward(motorvalue=-200):
             setMotorSpeeds(motorvalue, motorvalue)
             lastDirectionForward = False
 
+import time
 def sharpleft():
     global left_motor, right_motor, drive_manual
     if drive_manual:
-        startval = left_motor.get_encoder_value()
-        while abs(left_motor.get_encoder_value() - startval) < 1000:
-            if lastDirectionForward:
-                setMotorSpeeds(-200,200)
-            else:
-                setMotorSpeeds(200, -200)
+        if lastDirectionForward:
+            setMotorSpeeds(-200,200)
+        else:
+            setMotorSpeeds(200, -200)
+        time.sleep(1)
+        setMotorSpeeds(0, 0)
 
 def sharpright():
     global left_motor, right_motor, drive_manual
     if drive_manual:
-        startval = left_motor.get_encoder_value()
-        while abs(left_motor.get_encoder_value() - startval) < 1000:
-            if lastDirectionForward:
-                setMotorSpeeds(200,-200)
-            else:
-                setMotorSpeeds(-200,200)
+        if lastDirectionForward:
+            setMotorSpeeds(200,-200)
+        else:
+            setMotorSpeeds(-200,200)
+        time.sleep(1)
+        setMotorSpeeds(0, 0)
 
 def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
     global left_motor, right_motor, drive_manual
