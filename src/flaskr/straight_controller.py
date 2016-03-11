@@ -129,7 +129,10 @@ class Straight(object):
             self.driving.stop_driving()
             time.sleep(0.13)
             [left,_,right,up] = self.cameraInfo
-            if left and up == None:
+            if up == None and left and right:
+                self.logger.add_log("invalid instruction, straight on T junction.. instruction removed")
+                return True
+            elif left and up == None:
                 print "hoek bocht links"
                 (mid,angle) = left
                 self.rob.drive_straight(mid/50/100)
