@@ -32,6 +32,13 @@ def receive_bat_data():
     interface.set_power_factor(x)
     return "send your power factor data here"
 
+@app.route('/tune')
+def receive_tuning_data():
+    key = request.args.get('key')
+    value = request.args.get('value')
+    interface.tune_parameter(key, value)
+    return "send your tuning data here"
+
 @app.route('/info')
 def show_pi_information():
     return render_template('information.html', info=interface.get_debug_info())
@@ -40,6 +47,10 @@ def show_pi_information():
 def show_command_queue():
     return render_template('showactionqueue.html', command_queue=interface.getCommandQueue())
 
+
+@app.route('/tuning')
+def show_tuning_page():
+    return render_template('tune.html');
 
 
 def gen(camera, oneFrame = False):

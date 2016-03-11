@@ -57,25 +57,26 @@ def backward(motorvalue=-200):
             setMotorSpeeds(motorvalue, motorvalue)
             lastDirectionForward = False
 
+import time
 def sharpleft():
     global left_motor, right_motor, drive_manual
     if drive_manual:
-        startval = left_motor.get_encoder_value()
-        while abs(left_motor.get_encoder_value() - startval) < 1000:
-            if lastDirectionForward:
-                setMotorSpeeds(-200,200)
-            else:
-                setMotorSpeeds(200, -200)
+        if lastDirectionForward:
+            setMotorSpeeds(-200,200)
+        else:
+            setMotorSpeeds(200, -200)
+        time.sleep(1)
+        setMotorSpeeds(0, 0)
 
 def sharpright():
     global left_motor, right_motor, drive_manual
     if drive_manual:
-        startval = left_motor.get_encoder_value()
-        while abs(left_motor.get_encoder_value() - startval) < 1000:
-            if lastDirectionForward:
-                setMotorSpeeds(200,-200)
-            else:
-                setMotorSpeeds(-200,200)
+        if lastDirectionForward:
+            setMotorSpeeds(200,-200)
+        else:
+            setMotorSpeeds(-200,200)
+        time.sleep(1)
+        setMotorSpeeds(0, 0)
 
 def left(leftMotorAbsSpeed = 100, rightMotorAbsSpeed = 250):
     global left_motor, right_motor, drive_manual
@@ -177,8 +178,13 @@ def follow_line(x):
         logger.add_log("cameraInfo: " + str(np.array(eval(x))))
     rob.follow_the_line(x)
 
-import driving
-
+try: import driving
+except: pass
 def set_power_factor(x):
     print "try to set battery factor"
     driving.Driving.battery_factor = x
+    print driving.Driving.battery_factor
+
+def tune_parameter(key, value):
+    print key, value
+    pass
