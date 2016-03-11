@@ -185,6 +185,17 @@ def set_power_factor(x):
     driving.Driving.battery_factor = x
     print driving.Driving.battery_factor
 
+import straight_controller
 def tune_parameter(key, value):
+    global rob
     print key, value
-    pass
+    try:
+        if key == "down":
+            straight_controller.Straight.downVal = float(value)
+        if key == "mid":
+            straight_controller.Straight.midVal = float(value)
+        if key == "angle":
+            straight_controller.Straight.angleVal = float(value)
+    except:
+        print "something went wrong!"
+        pass
