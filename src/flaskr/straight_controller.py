@@ -21,25 +21,28 @@ class Straight(object):
 
     def add_history(self,element):
         self.history.appendleft(element)
-
+    angleVal = 35
+    midVal = 70
+    downVal = 90
     def follow_road(self):
+        global angleVal, midVal, downVal
         [_,down,_,up] = self.cameraInfo
         if up:
             (mid,angle) = up
             fact = 0
             if angle > 30:
-                fact = angle/35
+                fact = angle/angleVal
                 print "angle: %s" %fact
             else:
                 mid = 320 - mid
-                fact = mid/70
+                fact = mid/midVal
                 print "mid: %s" %fact
             corr = self.calculate_correction(fact)
             self.correction(corr)
         elif down:
             (mid,angle) = down
             mid = 320 - mid
-            fact = mid/90
+            fact = mid/downVal
             print "down: %s" %fact
             corr = self.calculate_correction(fact)
             self.correction(corr)
