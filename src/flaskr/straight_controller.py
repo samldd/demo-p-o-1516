@@ -24,45 +24,25 @@ class Straight(object):
 
     def follow_road(self):
         [_,down,_,up] = self.cameraInfo
-        if up and down:
-            (_,angleUp) = up
-            (_,angleDown) = down
-            if abs(angleUp) > 25 and abs(angleDown) < 25:
-                fact = -angleUp/40
-                print "up25down25: %s" %fact
-                corr = self.calculate_correction(fact)
-                self.driving.drive_correction(corr)
-                self.write_debug_info("correction = %s" %corr)
-                return
-            if abs(angleDown) > 15:
-                fact = -angleUp/20
-                print "up25down25: %s" %fact
-                corr = self.calculate_correction(fact)
-                self.driving.drive_correction(corr)
-                self.write_debug_info("correction = %s" %corr)
-                return
-        if down:
-            (mid,angle) = down
-            mid = 320-mid
-            if abs(mid) > 80:
-                fact = mid/50
-                corr = self.calculate_correction(fact)
-                self.correction(corr)
-            else:
-                fact = -angle/2.75
-                corr = self.calculate_correction(fact)
-                self.correction(corr)
-        elif up:
+        if up:
             (mid,angle) = up
-            mid = 320 - mid
-            if abs(mid) > 70:
-                fact = mid/45
-                corr = self.calculate_correction(fact)
-                self.correction(corr)
+            fact = 0
+            if angle > 30:
+                fact = angle/35
+                print "angle: %s" %fact
             else:
-                fact = angle/10
-                corr = self.calculate_correction(fact)
-                self.correction(corr)
+                mid = 320 - mid
+                fact = mid/70
+                print "mid: %s" %fact
+            corr = self.calculate_correction(fact)
+            self.correction(corr)
+        elif down:
+            (mid,angle) = down
+            mid = 320 - mid
+            fact = mid/90
+            print "down: %s" %fact
+            corr = self.calculate_correction(fact)
+            self.correction(corr)
         else:
             self.search_line()
 
@@ -121,9 +101,11 @@ class Straight(object):
         self.write_debug_info("correction = %s" %correction)
 
     def rotate(self,degrees):
-        wheel_degrees = self.driving.turn(degrees)
+        speed = 65
+        wheel_degrees = self.driving.turn(degrees,speed)
+        pleft,pright = self.driving.get_driven_distance()
         while True:
-            time.sleep(0.05)
+            time.sleep(0.07)
             [_,down,_,up] = self.cameraInfo
             if up or down:
                 self.driving.stop_driving()
@@ -132,15 +114,20 @@ class Straight(object):
             if left > abs(wheel_degrees) or right > abs(wheel_degrees):
                 self.driving.stop_driving()
                 break
+            if abs(left-pleft) < 5 or abs(right-pright) < 5:
+                speed += 5
+                self.driving.turn(degrees,speed)
+            pleft = left
+            pright = right
 
     def check_crossing(self):
         [left,_,right,_] = self.cameraInfo
         if left or right:
             print "possible crossing.. double check"
-            self.follow_road()
-            time.sleep(0.10)
+            self.driving.drive_straight(60)
+            time.sleep(0.05)
             self.driving.stop_driving()
-            time.sleep(0.10)
+            time.sleep(0.13)
             [left,_,right,up] = self.cameraInfo
             if left and up == None:
                 print "hoek bocht links"
@@ -176,7 +163,6 @@ class Straight(object):
             self.follow_road()
             prev = self.cameraInfo
             time.sleep(0.10)
-
 
     def write_debug_info(self,text):
         self.latest_action = text

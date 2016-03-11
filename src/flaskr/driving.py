@@ -60,7 +60,6 @@ class Driving(threading.Thread):
             self.right_speed = self.default_speed/self.factor
 
     def drive_correction(self,correction):
-        self.logger.add_log("correction factor = %s" %correction)
         if abs(correction) < 1:
             self.drive_straight(self.battery_factor*80)
         else:
@@ -68,18 +67,16 @@ class Driving(threading.Thread):
                 self.stop_driving()
             self.direction = "forward"
             self.paused = False
-
-            correction = (correction-1)/2*100
-
+            self.default_speed = 60*math.pow(abs(correction),1/3) if abs(correction)> 2.15 else 80*math.sqrt(abs(correction))
             self.factor = correction
             if correction > 0:
-                self.left_speed = Driving.battery_factor*(115-correction/2)
-                self.right_speed = Driving.battery_factor*(115+correction/2)
-                self.factor = self.right_speed/self.left_speed
+                self.left_speed = Driving.battery_factor*self.default_speed/correction
+                self.right_speed = Driving.battery_factor*self.default_speed
             else:
-                self.left_speed = Driving.battery_factor*(115+correction/2)
-                self.right_speed = Driving.battery_factor*(115-correction/2)
-                self.factor = self.left_speed/self.right_speed
+                self.left_speed = Driving.battery_factor*self.default_speed
+                self.right_speed = Driving.battery_factor*self.default_speed/abs(correction)
+            self.left_speed *= Driving.battery_factor
+            self.right_speed *= Driving.battery_factor
 
     def get_driven_distance(self):
         Ticks360 = 700

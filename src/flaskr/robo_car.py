@@ -36,7 +36,7 @@ class RoboCar(object):
 
     def turn(self,degree):
         print "turn %d" %degree
-        speed = 70
+        speed = 65
         wheel_degrees = self.driving.turn(degree,speed)
         time.sleep(0.05)
         pleft,pright = self.driving.get_driven_distance()
@@ -45,9 +45,9 @@ class RoboCar(object):
             left,right = self.driving.get_driven_distance()
             if left > abs(wheel_degrees) or right > abs(wheel_degrees):
                 break
-            if left-pleft < 15 or right-pright <15:
-                speed += 10
-                self.driving.turn(0,speed)
+            if abs(left-pleft) < 8 or abs(right-pright < 8):
+                speed += 5
+                self.driving.turn(degree,speed)
             pleft = left
             pright = right
         self.driving.stop_driving()

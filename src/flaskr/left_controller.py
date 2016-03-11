@@ -17,20 +17,26 @@ class Left(object):
 
     def check_crossing(self):
         [left,_,_,_] = self.cameraInfo
-        if left:
+        if left != None:
             print "possible left turn.. double check"
-            self.straightController.follow_road()
-            time.sleep(0.10)
+            self.driving.drive_straight(60)
+            time.sleep(0.05)
             self.driving.stop_driving()
-            time.sleep(0.10)
-            [left,_,_,up] = self.cameraInfo
-            if left and up:
+            time.sleep(0.13)
+            [left,_,right,up] = self.cameraInfo
+            if left != None and up != None:
                 print "turn left"
                 (mid,angle) = left
                 self.rob.drive_straight(mid/50/100)
                 self.rob.turn(90)
                 return True
-            elif left:
+            elif right != None and left != None:
+                print "T splitsing"
+                (mid,angle) = right
+                self.rob.drive_straight(mid/50/100)
+                self.rob.turn(90)
+                return True
+            elif left != None:
                 print "hoek bocht"
                 (mid,angle) = left
                 self.rob.drive_straight(mid/50/100)

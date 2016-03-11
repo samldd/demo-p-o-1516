@@ -178,7 +178,7 @@ def follow_line(x):
     rob.follow_the_line(x)
 
 import driving
+
 def set_power_factor(x):
     print "try to set battery factor"
     driving.Driving.battery_factor = x
-    print driving.Driving.battery_factor

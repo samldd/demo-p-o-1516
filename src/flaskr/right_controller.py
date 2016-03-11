@@ -20,13 +20,19 @@ class Right(object):
         [_,_,right,_] = self.cameraInfo
         if right:
             print "possible left turn.. double check"
-            self.straightController.follow_road()
-            time.sleep(0.10)
+            self.driving.drive_straight(60)
+            time.sleep(0.05)
             self.driving.stop_driving()
-            time.sleep(0.10)
-            [_,_,right,up] = self.cameraInfo
+            time.sleep(0.13)
+            [left,_,right,up] = self.cameraInfo
             if right and up:
                 print "turn right"
+                (mid,angle) = right
+                self.rob.drive_straight(mid/50/100)
+                self.rob.turn(-90)
+                return True
+            elif right and left:
+                print "T splitsing"
                 (mid,angle) = right
                 self.rob.drive_straight(mid/50/100)
                 self.rob.turn(-90)
